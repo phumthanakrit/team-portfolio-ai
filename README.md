@@ -1,7 +1,9 @@
 
-# Team Portfolio AI
+# KUAi — Know Us. Ask AI.
 
-AIE312 Final Project — Team Portfolio and AI Chat Application
+**Team Portfolio AI | AIE312 Final Project**
+
+A bilingual team portfolio and AI chat application that introduces our team, showcases collaborative projects, and provides an interactive chat interface.
 
 A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, PostgreSQL persistence, and Google Gemini integration in the backend.
 
@@ -10,16 +12,30 @@ A web application that presents our team portfolio and provides an AI-powered ch
 | Component | Status |
 |---|---|
 | React + TypeScript Frontend | Implemented |
-| Group Portfolio Page | Implemented (sample data) |
+| Group Portfolio Page | Implemented |
+| English / Thai Language Support | Implemented |
 | Interactive Chat UI | Implemented |
+| Unicode-aware Character Counter | Implemented |
+| Project Image Fallback | Implemented |
 | Frontend API Service | Implemented |
 | Chat API Contract | Documented |
-| Frontend Unit and Component Tests | Implemented |
+
+| Frontend Automated Tests | 65 tests passing |
+| ESLint | Passing |
+| Production Build | Verified |
 | GitHub Actions Frontend CI | Passing |
+| Production Website | Deployed |
 | Express Backend | Implemented |
 | PostgreSQL Integration | Implemented (tables created on startup) |
 | Google Gemini Integration | Implemented (requires an API key) |
-| Production Deployment | Pending |
+
+## Project Branding
+
+- Product Name: KUAi
+- Tagline: Know Us. Ask AI.
+- Team Name: KNOW US. ASK AI.
+- Production Website: https://vercel.app
+
 
 > Chat requests require a configured backend, a running PostgreSQL database, and a Google Gemini API key.
 

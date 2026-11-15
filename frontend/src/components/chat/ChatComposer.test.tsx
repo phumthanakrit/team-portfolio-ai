@@ -299,9 +299,66 @@ describe('ChatComposer Component', () => {
     ).toBeInTheDocument()
   })
 
-  // TEST 9: THAI CHARACTER COUNT
+    // TEST 9: EMOJI GRAPHEME COUNT
 
-  it('should update the character count in Thai', async () => {
+  it('should count a combined family emoji as one character', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+
+    render(
+      <ChatComposerHarness onSubmit={onSubmit} />,
+    )
+
+    const textarea = screen.getByRole('textbox', {
+      name: 'Type your message',
+    })
+
+    await user.type(textarea, '👨‍👩‍👧‍👦')
+
+    expect(textarea).toHaveValue('👨‍👩‍👧‍👦')
+
+    expect(
+      screen.getByText('1/2000 characters'),
+    ).toBeInTheDocument()
+  })
+
+  // TEST 10: MAXIMUM GRAPHEME COUNT
+
+  it('should limit input to 2000 grapheme clusters', () => {
+    const onSubmit = vi.fn()
+
+    render(
+      <ChatComposerHarness onSubmit={onSubmit} />,
+    )
+
+    const textarea = screen.getByRole('textbox', {
+      name: 'Type your message',
+    })
+
+    const longMessage = 'A'.repeat(2001)
+
+    // Simulate pasting text beyond the maximum length.
+    textarea.focus()
+
+    Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      'value',
+    )?.set?.call(textarea, longMessage)
+
+    textarea.dispatchEvent(
+      new Event('input', { bubbles: true }),
+    )
+
+    expect(textarea).toHaveValue('A'.repeat(2000))
+
+    expect(
+      screen.getByText('2000/2000 characters'),
+    ).toBeInTheDocument()
+  })
+
+  // TEST 11: THAI CHARACTER COUNT
+
+  it('should count Thai grapheme clusters correctly', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
 
@@ -319,7 +376,7 @@ describe('ChatComposer Component', () => {
     await user.type(textarea, 'สวัสดี')
 
     expect(
-      screen.getByText('6/2000 ตัวอักษร'),
+      screen.getByText('4/2000 ตัวอักษร'),
     ).toBeInTheDocument()
 
     expect(textarea).toHaveValue('สวัสดี')

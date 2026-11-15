@@ -9,6 +9,7 @@ import {
 import { FaGithub } from 'react-icons/fa'
 
 import { useLanguage } from '../../contexts/language-context'
+import ProjectCover from './ProjectCover'
 
 import {
   getLocalizedText,
@@ -147,28 +148,12 @@ function ProjectCard({
       className="overflow-hidden rounded-2xl border border-border-subtle bg-surface-900 transition duration-300 hover:-translate-y-1 hover:shadow-glow"
     >
       {/* Project Cover */}
-      <div className="relative h-52 overflow-hidden bg-linear-to-br from-brand-500/15 to-accent-cyan/5">
-        {project.coverImage ? (
-          <img
-            src={project.coverImage}
-            alt={`${title} preview`}
-            loading="lazy"
-            className="size-full object-cover"
-          />
-        ) : (
-          <div className="grid size-full place-items-center">
-            <div className="text-center">
-              <FolderKanban
-                size={38}
-                className="mx-auto text-brand-300"
-                aria-hidden="true"
-              />
-              <p className="mt-3 text-xs text-slate-500">
-                {copy.noImage}
-              </p>
-            </div>
-          </div>
-        )}
+      <div className="relative">
+        <ProjectCover
+          coverImage={project.coverImage}
+          alt={`${title} preview`}
+          fallbackLabel={copy.noImage}
+        />
 
         {project.isFeatured && (
           <span className="absolute left-4 top-4 rounded-full border border-brand-300/20 bg-ink-950/80 px-3 py-1.5 text-[10px] font-semibold text-brand-300 backdrop-blur">

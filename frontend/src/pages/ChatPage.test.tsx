@@ -189,6 +189,61 @@ describe('ChatPage Component', () => {
     expect(mockSendChatMessage).not.toHaveBeenCalled()
   })
 
+
+  // TEST: THAI TYPING INDICATOR
+
+  it('should display the Thai typing indicator while waiting for the API', async () => {
+    const user = userEvent.setup()
+
+    const pending = createDeferred<ChatApiResponse>()
+
+    mockSendChatMessage.mockReturnValueOnce(
+      pending.promise,
+    )
+
+    renderChatPage('th')
+
+    const textarea = screen.getByRole('textbox', {
+      name: 'พิมพ์ข้อความของคุณ',
+    })
+
+    await user.type(
+      textarea,
+      'ช่วยเล่าเกี่ยวกับทีม',
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'ส่งข้อความ',
+      }),
+    )
+
+    expect(
+      screen.getByRole('status'),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('ผู้ช่วย AI กำลังคิด...'),
+    ).toBeInTheDocument()
+
+    // Resolve the mocked backend response
+    await act(async () => {
+      pending.resolve({
+        reply: 'Our team works collaboratively.',
+        conversationId: 'conversation-th-001',
+      })
+
+      await pending.promise
+    })
+
+    expect(
+      await screen.findByText(
+        'Our team works collaboratively.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+
   // TEST 1: EMPTY STATE
 
   it('should display the empty state and suggested questions', () => {

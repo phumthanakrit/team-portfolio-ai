@@ -1,3 +1,7 @@
+import {
+  countGraphemes,
+  MAX_CHAT_MESSAGE_GRAPHEMES,
+} from '../utils/chatMessage'
 
 import {
   afterEach,
@@ -103,11 +107,11 @@ describe('sendChatMessage', () => {
 
   // TEST 3: MESSAGE TOO LONG
 
-  it('should reject messages longer than 2000 characters', async () => {
+  it('should reject messages exceeding 2000 grapheme clusters', async () => {
+    const message = 'A'.repeat(2001)
+
     await expect(
-      sendChatMessage({
-        message: 'A'.repeat(2001),
-      }),
+      sendChatMessage({ message }),
     ).rejects.toMatchObject({
       code: 'MESSAGE_TOO_LONG',
     })
@@ -115,46 +119,87 @@ describe('sendChatMessage', () => {
     expect(getFetchMock()).not.toHaveBeenCalled()
   })
 
-  // TEST 4: INVALID CONVERSATION ID
+  // TEST 4: THAI GRAPHEME VALIDATION
 
-  it('should reject an empty conversation ID', async () => {
+  it('should accept exactly 2000 Thai grapheme clusters even when UTF-16 length exceeds 2000', async () => {
+    const message = 'สวัสดี'.repeat(500)
+
+    expect(message.length).toBeGreaterThan(
+      MAX_CHAT_MESSAGE_GRAPHEMES,
+    )
+
+    expect(countGraphemes(message)).toBe(
+      MAX_CHAT_MESSAGE_GRAPHEMES,
+    )
+
+    getFetchMock().mockResolvedValue(
+      jsonResponse(validResponse),
+    )
+
     await expect(
-      sendChatMessage({
-        message: 'Hello',
-        conversationId: '   ',
-      }),
+      sendChatMessage({ message }),
+    ).resolves.toEqual(validResponse)
+
+    expect(getFetchMock()).toHaveBeenCalledOnce()
+  })
+
+    // TEST 5: THAI MESSAGE EXCEEDS LIMIT
+
+  it('should reject Thai messages exceeding 2000 grapheme clusters', async () => {
+    const message = 'สวัสดี'.repeat(501)
+
+    expect(countGraphemes(message)).toBeGreaterThan(
+      MAX_CHAT_MESSAGE_GRAPHEMES,
+    )
+
+    await expect(
+      sendChatMessage({ message }),
     ).rejects.toMatchObject({
-      code: 'INVALID_CONVERSATION_ID',
+      code: 'MESSAGE_TOO_LONG',
     })
 
     expect(getFetchMock()).not.toHaveBeenCalled()
   })
 
-  // TEST 5: HTTP ERROR
+// TEST 6: INVALID CONVERSATION ID
 
-  it('should handle HTTP error responses', async () => {
-    getFetchMock().mockResolvedValue(
-      jsonResponse(
-        {
-          error: {
-            code: 'INVALID_MESSAGE',
-            message: 'Message is required.',
-          },
-        },
-        400,
-      ),
-    )
-
-    await expect(
-      sendChatMessage(validRequest),
-    ).rejects.toMatchObject({
-      name: 'ChatApiException',
-      status: 400,
-      code: 'INVALID_MESSAGE',
-      message: 'Message is required.',
-    })
+it('should reject an empty conversation ID', async () => {
+  await expect(
+    sendChatMessage({
+      message: 'Hello',
+      conversationId: '   ',
+    }),
+  ).rejects.toMatchObject({
+    code: 'INVALID_CONVERSATION_ID',
   })
 
+  expect(getFetchMock()).not.toHaveBeenCalled()
+})
+
+// TEST 7: HTTP ERROR
+
+it('should handle HTTP error responses', async () => {
+  getFetchMock().mockResolvedValue(
+    jsonResponse(
+      {
+        error: {
+          code: 'INVALID_MESSAGE',
+          message: 'Message is required.',
+        },
+      },
+      400,
+    ),
+  )
+
+  await expect(
+    sendChatMessage(validRequest),
+  ).rejects.toMatchObject({
+    name: 'ChatApiException',
+    status: 400,
+    code: 'INVALID_MESSAGE',
+    message: 'Message is required.',
+  })
+})
   // TEST 6: INVALID JSON
 
   it('should reject an invalid JSON response', async () => {

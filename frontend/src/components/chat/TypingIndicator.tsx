@@ -1,7 +1,27 @@
 
 import { Sparkles } from 'lucide-react'
 
+import { useLanguage } from '../../contexts/language-context'
+
+import type { Language } from '../../data/portfolioData'
+
+interface TypingIndicatorCopy {
+  label: string
+}
+
+const typingIndicatorCopy: Record<Language, TypingIndicatorCopy> = {
+  en: {
+    label: 'Team AI is thinking...',
+  },
+  th: {
+    label: 'ผู้ช่วย AI กำลังคิด...',
+  },
+}
+
 function TypingIndicator() {
+  const { language } = useLanguage()
+  const copy = typingIndicatorCopy[language]
+
   return (
     <div
       role="status"
@@ -13,21 +33,17 @@ function TypingIndicator() {
       </div>
 
       <div className="flex items-center gap-3 rounded-2xl rounded-tl-sm border border-white/10 bg-surface-800 px-4 py-3">
-
         <span className="text-xs text-slate-400">
-          Team AI is thinking
+          {copy.label}
         </span>
 
         <div className="flex items-center gap-1">
-
           <span className="size-1.5 animate-bounce rounded-full bg-brand-300" />
 
           <span className="size-1.5 animate-bounce rounded-full bg-brand-300 [animation-delay:150ms]" />
 
           <span className="size-1.5 animate-bounce rounded-full bg-brand-300 [animation-delay:300ms]" />
-
         </div>
-
       </div>
     </div>
   )

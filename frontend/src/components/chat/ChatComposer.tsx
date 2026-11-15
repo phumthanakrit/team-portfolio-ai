@@ -1,3 +1,8 @@
+import {
+  countGraphemes,
+  MAX_CHAT_MESSAGE_GRAPHEMES,
+  truncateGraphemes,
+} from '../../utils/chatMessage'
 
 import type { FormEvent } from 'react'
 
@@ -59,7 +64,13 @@ function ChatComposer({
       <div className="flex items-end gap-3 rounded-2xl border border-border-subtle bg-ink-950 p-3 transition focus-within:border-brand-400/50">
         <textarea
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            const nextValue = event.target.value
+
+            onChange(
+              truncateGraphemes(nextValue),
+            )
+          }}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
               event.preventDefault()
@@ -70,7 +81,6 @@ function ChatComposer({
           aria-label={copy.inputLabel}
           aria-describedby="chat-composer-hint chat-composer-count"
           rows={2}
-          maxLength={2000}
           disabled={isLoading}
           className="max-h-36 min-h-12 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-white outline-none placeholder:text-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
         />
@@ -108,7 +118,7 @@ function ChatComposer({
           id="chat-composer-count"
           className="text-[10px] text-slate-400"
         >
-          {value.length}/2000 {copy.characterUnit}
+          {countGraphemes(value)}/{MAX_CHAT_MESSAGE_GRAPHEMES} {copy.characterUnit}
         </p>
       </div>
     </form>
