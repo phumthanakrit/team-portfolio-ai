@@ -3,6 +3,8 @@
  * @vitest-environment jsdom
  */
 
+import type { ReactNode } from 'react'
+
 import {
   afterEach,
   describe,
@@ -20,12 +22,32 @@ import '@testing-library/jest-dom/vitest'
 
 import MessageBubble from './MessageBubble'
 
+import { LanguageContext } from '../../contexts/language-context'
+
+import type { Language } from '../../data/portfolioData'
 import type { ChatMessage } from '../../types/chat'
 
 // Clean up rendered components after every test
 afterEach(() => {
   cleanup()
 })
+
+// Render with an explicit language context
+function renderWithLanguage(
+  component: ReactNode,
+  language: Language = 'en',
+) {
+  return render(
+    <LanguageContext.Provider
+      value={{
+        language,
+        setLanguage: () => undefined,
+      }}
+    >
+      {component}
+    </LanguageContext.Provider>,
+  )
+}
 
 // Test Data
 const userMessage: ChatMessage = {
@@ -52,7 +74,7 @@ describe('MessageBubble Component', () => {
 
   it('should display a user message correctly', () => {
 
-    render(
+    renderWithLanguage(
       <MessageBubble message={userMessage} />,
     )
 
@@ -70,7 +92,7 @@ describe('MessageBubble Component', () => {
 
   it('should display an assistant message correctly', () => {
 
-    render(
+    renderWithLanguage(
       <MessageBubble message={assistantMessage} />,
     )
 
@@ -84,11 +106,44 @@ describe('MessageBubble Component', () => {
 
   })
 
+    // TEST 3: USER MESSAGE IN THAI
+
+  it('should display a Thai user label when language is Thai', () => {
+    renderWithLanguage(
+      <MessageBubble message={userMessage} />,
+      'th',
+    )
+
+    expect(
+      screen.getByText('คุณ'),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('Who are the team members?'),
+    ).toBeInTheDocument()
+  })
+
+  // TEST 4: ASSISTANT MESSAGE IN THAI
+
+  it('should display a Thai assistant label when language is Thai', () => {
+    renderWithLanguage(
+      <MessageBubble message={assistantMessage} />,
+      'th',
+    )
+
+    expect(
+      screen.getByText('ผู้ช่วย AI'),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('Our team consists of three members.'),
+    ).toBeInTheDocument()
+  })
   // TEST 3: MESSAGE TIMESTAMP
 
   it('should display the correct message timestamp', () => {
 
-    render(
+    renderWithLanguage(
       <MessageBubble message={userMessage} />,
     )
 

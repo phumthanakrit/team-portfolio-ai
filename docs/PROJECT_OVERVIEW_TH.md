@@ -1,44 +1,62 @@
-# Team Portfolio AI — ภาพรวมโครงการและคู่มือเริ่มต้น
+# KUAi — Know Us. Ask AI.
 
-> เอกสารแนะนำโครงการสำหรับสมาชิกในทีม ผู้ตรวจงาน และผู้ที่ต้องการทำความเข้าใจระบบก่อนแก้ไขโค้ด  
-> สถานะเอกสารอ้างอิงจากผลการทำงานที่ยืนยันในแชตจนถึง Step 35
+> AIE312 Final Project — Team Portfolio and AI Chat Application
+>
+> เอกสารภาพรวมโครงการสำหรับสมาชิกในทีม อาจารย์ ผู้ตรวจงาน และผู้พัฒนาที่ต้องการทำความเข้าใจระบบ
+
+**KUAi** เป็นเว็บไซต์นำเสนอผลงานของทีม KNOW US. ASK AI. พร้อมหน้า Interactive AI Chat ที่รองรับภาษาไทยและภาษาอังกฤษ
 
 ## 1. โครงการนี้คืออะไร
 
-**Team Portfolio AI** เป็นโปรเจกต์ปลายภาค AIE312 สำหรับนำเสนอผลงานของสมาชิกในกลุ่มผ่านหน้า Group Portfolio และมีหน้า Chat สำหรับสื่อสารกับ AI ในรูปแบบแชต
+KUAi ประกอบด้วยระบบหลัก 2 ส่วน:
 
-แนวทางระบบที่กลุ่มกำลังพัฒนา:
+1. **Group Portfolio** — นำเสนอข้อมูลทีม สมาชิก ทักษะ บทบาท และผลงานของกลุ่ม
+2. **AI Chat UI** — อินเทอร์เฟซสำหรับสนทนา พร้อม Loading Indicator, Error Handling, Retry และการจัดการ Conversation ID
 
-1. **Group Portfolio** — แสดงข้อมูลกลุ่ม สมาชิก บทบาท ทักษะ และช่องทางติดต่อ
-2. **AI Chat UI** — ให้ผู้ใช้พิมพ์ข้อความ ดูประวัติข้อความในหน้าจอ สถานะกำลังตอบ และข้อผิดพลาด
-3. **Backend API** — ใช้ Express เป็นจุดรับคำขอจาก Frontend และเชื่อมต่อบริการ AI ตามการออกแบบของทีม
-4. **Database** — ใช้ PostgreSQL เป็นฐานข้อมูลที่วางแผนไว้สำหรับจัดเก็บข้อมูลที่จำเป็น เช่น ประวัติการสนทนา
+แนวทางสถาปัตยกรรมที่วางแผนไว้:
 
-**สถานะสำคัญ:** Frontend และ API client ถูกพัฒนาแล้ว แต่ Express Backend, PostgreSQL integration และการเชื่อมต่อ AI จริงยังอยู่ระหว่างพัฒนา/รอการเชื่อมต่อ ดังนั้นอย่าอธิบายว่า AI Chat ใช้งานจริงครบวงจรแล้วจนกว่าจะทดสอบ Backend และ Database จริงผ่าน
+3. **Backend API** — Express เป็นจุดรับคำขอจาก Frontend และเชื่อมต่อ AI Provider
+4. **Database** — PostgreSQL สำหรับจัดเก็บข้อมูลและประวัติการสนทนา
+
+**สถานะสำคัญ:** Frontend, UI Components และ API Client ได้รับการพัฒนาแล้ว แต่ Express Backend, PostgreSQL Integration และ Live AI Model Integration ยังไม่เสร็จสมบูรณ์
+
+Automated Tests ปัจจุบันใช้ Mock API Responses จึงไม่ถือเป็นหลักฐานว่า Live AI Integration ทำงานแล้ว
 
 ## 2. เป้าหมายและขอบเขตปัจจุบัน
 
 ### งานที่ทำแล้วและมีผลตรวจยืนยัน
 
-- React + TypeScript + Vite frontend
-- หน้า Portfolio และหน้า Chat พร้อม routing
-- แยก Component สำหรับส่วนหลักของ Portfolio และ Chat
-- API service ด้วย `fetch()` สำหรับเรียก `POST /api/chat`
-- API contract ใน `docs/chat-api-contract.md`
-- Validation ฝั่ง Frontend, timeout และการจัดการ API error
-- Automated tests รวม 25 tests ผ่าน
-- ESLint และ Production Build ผ่าน
-- GitHub Actions Frontend CI ผ่านทุกขั้นตอน
-- GitHub repository และ Root README ถูก Push แล้ว
+- React + TypeScript + Vite Frontend
+- Group Portfolio และ Chat Page พร้อม React Router
+- Component-based architecture
+- English / Thai Language Support
+- Local Storage สำหรับเก็บภาษาที่เลือก
+- Interactive Chat UI พร้อม Loading และ Error States
+- Unicode-aware Character Counter ด้วย Intl.Segmenter
+- จำกัดข้อความสูงสุด 2,000 Grapheme Clusters
+- Project Image Fallback สำหรับรูปภาพที่ไม่มีหรือโหลดไม่สำเร็จ
+- Frontend API Client สำหรับ POST /api/chat
+- API Contract ใน `docs/chat-api-contract.md`
+- Automated Frontend Tests จำนวน 65 Tests ผ่าน
+- ESLint ผ่าน
+- TypeScript และ Production Build ผ่าน
+- Production Preview ผ่านการทดสอบ
+
+### สถานะ Production
+
+- Production Website เดิมได้รับการ Deploy แล้ว
+- URL: https://team-portfolio-ai.vercel.app/
+- การปรับปรุง Local ล่าสุดยังไม่ได้ Commit, Push หรือ Deploy
+- ผล Production Preview ล่าสุดเป็นการทดสอบ Local Build ไม่ใช่การยืนยันว่า Local Changes ถูกเผยแพร่บน Production แล้ว
 
 ### งานที่ยังไม่ถือว่าเสร็จ
 
 - Express API ที่ทำงานจริง
-- การเชื่อมต่อ PostgreSQL และการจัดเก็บประวัติการสนทนา
-- การเชื่อมต่อ LLM/AI provider และการทดสอบคำตอบจาก AI จริง
-- การนำข้อมูลตัวอย่างของสมาชิกออกและใส่ข้อมูลจริงที่สมาชิกอนุญาตให้เผยแพร่
-- Production deployment และการทดสอบระบบบน URL จริง
-- Authentication/Authorization หากอาจารย์หรือข้อกำหนดระบบต้องการ (Frontend ปัจจุบันยังไม่ได้ยืนยันว่ามีระบบ Auth)
+- PostgreSQL Integration และ Persistent Conversation History
+- Live LLM / AI Provider Integration
+- การแทนที่ข้อมูลตัวอย่างด้วยข้อมูลจริงที่สมาชิกอนุญาตให้เผยแพร่
+- Backend Validation และ Security Implementation
+- Authentication / Authorization หากเป็นข้อกำหนดของระบบในอนาคต
 
 ## 3. เทคโนโลยีที่ใช้
 
@@ -93,35 +111,37 @@ Browser
 team-portfolio-ai/
 ├── .github/
 │   └── workflows/
-│       └── frontend-ci.yml        # CI สำหรับตรวจ Frontend บน GitHub Actions
+│       └── frontend-ci.yml
 ├── docs/
-│   ├── chat-api-contract.md       # สัญญา request/response ระหว่าง Frontend กับ Backend
-│   ├── PROJECT_OVERVIEW_TH.md    # ภาพรวมโครงการและหน้าที่ไฟล์
-│   ├── FRONTEND_FILE_MAP_TH.md   # แผนผังไฟล์ Frontend แบบละเอียด
-│   ├── FRONTEND_SETUP_HISTORY_TH.md # บันทึกการพัฒนา Step 01–35
-│   └── TEAM_HANDOFF_TH.md        # คู่มือส่งต่องานให้ Backend/Database
+│   ├── chat-api-contract.md
+│   ├── PROJECT_OVERVIEW_TH.md
+│   ├── FRONTEND_FILE_MAP_TH.md
+│   ├── FRONTEND_SETUP_HISTORY_TH.md
+│   └── TEAM_HANDOFF_TH.md
 ├── frontend/
-│   ├── public/                   # ไฟล์ Static ที่เสิร์ฟตรง
+│   ├── public/
+│   │   └── favicon.svg
 │   ├── src/
-│   │   ├── assets/               # รูปภาพและ assets ที่ import ในโค้ด
-│   │   ├── components/           # UI Components ที่นำกลับมาใช้ซ้ำ
-│   │   ├── data/                 # ข้อมูล Portfolio
-│   │   ├── pages/                # หน้าหลักของแอป
-│   │   ├── services/             # การเรียก API
-│   │   ├── types/                # TypeScript types/interfaces
-│   │   ├── App.tsx               # Route และ app shell
-│   │   ├── App.css               # CSS เฉพาะส่วน App ที่ยังใช้งาน
-│   │   ├── index.css             # Global styles และ Tailwind theme
-│   │   └── main.tsx              # Frontend entry point
-│   ├── .env.example              # ตัวอย่าง Environment Variables
-│   ├── .gitignore                # Ignore ของ Frontend
-│   ├── package.json              # Dependencies และ scripts
-│   ├── package-lock.json         # Lock dependencies ให้ติดตั้งซ้ำได้
-│   ├── vite.config.ts            # Vite, proxy และ Vitest config
-│   └── tsconfig*.json            # TypeScript configuration
-├── .gitignore                    # Ignore ระดับ Repository
-├── README.md                     # หน้าแนะนำโครงการบน GitHub
-└── backend/ และ database/        # พื้นที่ที่วางแผนไว้; โฟลเดอร์ว่างไม่ถูก Git track
+│   │   ├── components/
+│   │   │   ├── chat/
+│   │   │   ├── layout/
+│   │   │   └── portfolio/
+│   │   │       └── ProjectCover.tsx
+│   │   ├── contexts/
+│   │   ├── data/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   └── main.tsx
+│   ├── .env.example
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   └── vercel.json
+└── README.md
 ```
 
 รายละเอียดระดับไฟล์อยู่ใน `FRONTEND_FILE_MAP_TH.md`
@@ -253,30 +273,47 @@ Content-Type: application/json
 
 ## 8. Testing และ CI
 
-มี Automated Tests รวม **25 tests** ตามผลรันที่ยืนยัน:
+ผล Automated Test ล่าสุดที่ยืนยันจาก Local Development:
+
+**12 Test Files — 65 Tests Passed**
 
 | Test file | จำนวน |
 |---|---:|
 | `src/services/chatApi.test.ts` | 9 |
-| `src/components/chat/MessageBubble.test.tsx` | 3 |
-| `src/components/chat/ChatComposer.test.tsx` | 7 |
-| `src/pages/ChatPage.test.tsx` | 6 |
-| **รวม** | **25** |
+| `src/contexts/LanguageProvider.test.tsx` | 5 |
+| `src/components/chat/MessageBubble.test.tsx` | 5 |
+| `src/components/chat/TypingIndicator.test.tsx` | 2 |
+| `src/components/chat/ChatComposer.test.tsx` | 11 |
+| `src/components/portfolio/TeamIntroduction.test.tsx` | 4 |
+| `src/components/portfolio/TeamProjectSection.test.tsx` | 5 |
+| `src/components/portfolio/MemberCard.test.tsx` | 6 |
+| `src/components/portfolio/MemberSection.test.tsx` | 3 |
+| `src/components/portfolio/TeamContact.test.tsx` | 4 |
+| `src/pages/PortfolioPage.test.tsx` | 2 |
+| `src/pages/ChatPage.test.tsx` | 9 |
+| **รวม** | **65** |
 
-GitHub Actions Workflow: `.github/workflows/frontend-ci.yml`
+### Quality Checks
 
-Workflow รันเมื่อมี Push หรือ Pull Request ที่แตะ `frontend/**` หรือไฟล์ Workflow และสามารถสั่ง Manual ได้ผ่าน `workflow_dispatch`
+- `npm run lint` — ผ่าน
+- `npm run test` — 65/65 ผ่าน
+- `npm run build` — ผ่าน
+- `npm run preview` — ผ่านการตรวจสอบ Local Production Build
 
-ลำดับ CI:
+### GitHub Actions
+
+Workflow: `.github/workflows/frontend-ci.yml`
+
+ประกอบด้วย:
 
 1. Checkout Repository
-2. Setup Node.js 24
-3. `npm ci`
-4. `npm run lint`
-5. `npm run test`
-6. `npm run build`
+2. Setup Node.js
+3. Install Dependencies ด้วย `npm ci`
+4. Run ESLint
+5. Run Automated Tests
+6. Build Production App
 
-ผลที่ยืนยันจาก GitHub Actions สำหรับ Commit `574f8bd`: ทุกขั้นตอนผ่าน
+หมายเหตุ: ผล Local Validation ล่าสุดไม่ได้หมายความว่า GitHub Actions ได้รันกับ Local Changes เหล่านี้แล้ว ต้อง Push Changes และตรวจสอบ Workflow Run ก่อนจึงจะยืนยันผล CI สำหรับ Commit ใหม่ได้
 
 ## 9. Git workflow สำหรับสมาชิก
 

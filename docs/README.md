@@ -8,9 +8,9 @@
 |---|---|---|
 | [`PROJECT_OVERVIEW_TH.md`](PROJECT_OVERVIEW_TH.md) | สมาชิกใหม่/อาจารย์/ผู้ตรวจงาน | โครงการทำอะไร ใช้เครื่องมืออะไร สถานะปัจจุบัน วิธีติดตั้งและรัน |
 | [`FRONTEND_FILE_MAP_TH.md`](FRONTEND_FILE_MAP_TH.md) | สมาชิกที่ต้องแก้ Frontend | หน้าที่ของแต่ละไฟล์/Component และควรเริ่มแก้จากจุดใด |
-| [`FRONTEND_SETUP_HISTORY_TH.md`](FRONTEND_SETUP_HISTORY_TH.md) | ผู้ต้องการดูประวัติการสร้าง | บันทึกขั้นตอน Step 01–35 ตั้งแต่สร้างโปรเจกต์จน Push ขึ้น GitHub |
+| [`FRONTEND_SETUP_HISTORY_TH.md`](FRONTEND_SETUP_HISTORY_TH.md) | ผู้ต้องการดูประวัติการพัฒนา | บันทึกขั้นตอน Step 01–36 รวม Phase H และ Step 36.1–36.6 พร้อมสถานะการพัฒนาล่าสุด |
 | [`TEAM_HANDOFF_TH.md`](TEAM_HANDOFF_TH.md) | สมาชิก Backend/Database และผู้ทำ Integration | API contract, ขอบเขต Backend/Database, สิ่งที่ต้องตกลงร่วมกัน และ Definition of Done |
-| [`chat-api-contract.md`](chat-api-contract.md) | Frontend/Backend developer | Request/response และ error contract ของ Chat API ที่ Frontend คาดหวัง |
+| [`chat-api-contract.md`](chat-api-contract.md) | Frontend/Backend developer | Request/response, error handling, Unicode validation สูงสุด 2,000 Grapheme Clusters และ Frontend timeout 30 วินาที |
 
 ## แนวทางการอ่าน
 

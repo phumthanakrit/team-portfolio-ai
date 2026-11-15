@@ -1,3 +1,7 @@
+import {
+  countGraphemes,
+  MAX_CHAT_MESSAGE_GRAPHEMES,
+} from '../utils/chatMessage'
 
 import type {
   ChatApiRequest,
@@ -67,7 +71,10 @@ function validateRequest(payload: ChatApiRequest): void {
     )
   }
 
-  if (payload.message.length > 2000) {
+  if (
+    countGraphemes(payload.message) >
+    MAX_CHAT_MESSAGE_GRAPHEMES
+  ) {
     throw new ChatApiException(
       'Message cannot exceed 2000 characters.',
       0,
