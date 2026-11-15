@@ -30,6 +30,13 @@ export interface ChatApiResponse {
   readonly conversationId: string
 }
 
+export type ChatHistoryMessage = ChatMessage
+
+export interface ChatHistoryResponse {
+  readonly conversationId: string
+  readonly messages: readonly ChatHistoryMessage[]
+}
+
 /**
  * Error response returned by Express
  */

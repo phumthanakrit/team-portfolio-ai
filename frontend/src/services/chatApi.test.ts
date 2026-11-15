@@ -8,7 +8,11 @@ import {
   vi,
 } from 'vitest'
 
-import { sendChatMessage } from './chatApi'
+import {
+  deleteChatConversation,
+  getChatHistory,
+  sendChatMessage,
+} from './chatApi'
 
 // =========================================
 // TEST DATA
@@ -22,6 +26,8 @@ const validResponse = {
   reply: 'Our team consists of three members.',
   conversationId: 'test-conversation-001',
 }
+
+const validConversationId = 'c0a80101-1234-4234-8234-123456789abc'
 
 // =========================================
 // TEST HELPERS
@@ -241,4 +247,37 @@ describe('sendChatMessage', () => {
     await rejectionAssertion
   })
 
+})
+
+describe('chat history API', () => {
+  it('should fetch and validate a conversation history', async () => {
+    const history = {
+      conversationId: validConversationId,
+      messages: [
+        {
+          id: '1',
+          role: 'assistant',
+          content: 'Hello.',
+          createdAt: '2026-11-15T12:00:00.000Z',
+        },
+      ],
+    }
+    getFetchMock().mockResolvedValue(jsonResponse(history))
+
+    await expect(getChatHistory(validConversationId)).resolves.toEqual(history)
+    expect(getFetchMock()).toHaveBeenCalledWith(
+      `/api/chat/conversations/${validConversationId}`,
+      expect.objectContaining({ method: 'GET' }),
+    )
+  })
+
+  it('should delete a conversation from the backend', async () => {
+    getFetchMock().mockResolvedValue(new Response(null, { status: 204 }))
+
+    await expect(deleteChatConversation(validConversationId)).resolves.toBeUndefined()
+    expect(getFetchMock()).toHaveBeenCalledWith(
+      `/api/chat/conversations/${validConversationId}`,
+      expect.objectContaining({ method: 'DELETE' }),
+    )
+  })
 })

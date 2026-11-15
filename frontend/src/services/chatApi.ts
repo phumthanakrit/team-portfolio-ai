@@ -1,5 +1,7 @@
 
 import type {
+  ChatHistoryMessage,
+  ChatHistoryResponse,
   ChatApiRequest,
   ChatApiResponse,
 } from '../types/chat'
@@ -13,6 +15,7 @@ const API_BASE_URL = (
 ).replace(/\/+$/, '')
 
 const CHAT_ENDPOINT = `${API_BASE_URL}/api/chat`
+const CONVERSATIONS_ENDPOINT = `${CHAT_ENDPOINT}/conversations`
 
 /**
  * Maximum request duration: 30 seconds
@@ -118,6 +121,115 @@ function createApiError(
     status,
     code,
   )
+}
+
+async function requestConversation(
+  conversationId: string,
+  method: 'GET' | 'DELETE',
+): Promise<unknown> {
+  if (!conversationId.trim()) {
+    throw new ChatApiException(
+      'Invalid conversation ID.',
+      0,
+      'INVALID_CONVERSATION_ID',
+    )
+  }
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+
+  try {
+    let response: Response
+
+    try {
+      response = await fetch(
+        `${CONVERSATIONS_ENDPOINT}/${encodeURIComponent(conversationId)}`,
+        {
+          method,
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        },
+      )
+    } catch {
+      if (controller.signal.aborted) {
+        throw new ChatApiException(
+          'The request timed out. Please try again.',
+          0,
+          'TIMEOUT_ERROR',
+        )
+      }
+
+      throw new ChatApiException(
+        'Unable to connect to the chat server. Please check that the backend is running.',
+        0,
+        'NETWORK_ERROR',
+      )
+    }
+
+    let responseBody: unknown = null
+
+    if (response.status !== 204) {
+      try {
+        responseBody = await response.json()
+      } catch {
+        if (response.ok) {
+          throw new ChatApiException(
+            'The server returned an invalid JSON response.',
+            response.status,
+            'INVALID_JSON',
+          )
+        }
+      }
+    }
+
+    if (!response.ok) {
+      throw createApiError(responseBody, response.status)
+    }
+
+    return responseBody
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
+
+function isChatHistoryMessage(value: unknown): value is ChatHistoryMessage {
+  return (
+    isRecord(value) &&
+    typeof value.id === 'string' &&
+    (value.role === 'user' || value.role === 'assistant') &&
+    typeof value.content === 'string' &&
+    typeof value.createdAt === 'string'
+  )
+}
+
+export async function getChatHistory(
+  conversationId: string,
+): Promise<ChatHistoryResponse> {
+  const payload = await requestConversation(conversationId, 'GET')
+
+  if (
+    !isRecord(payload) ||
+    typeof payload.conversationId !== 'string' ||
+    !Array.isArray(payload.messages) ||
+    !payload.messages.every(isChatHistoryMessage)
+  ) {
+    throw new ChatApiException(
+      'The server returned an invalid conversation history.',
+      200,
+      'INVALID_HISTORY',
+    )
+  }
+
+  return {
+    conversationId: payload.conversationId,
+    messages: payload.messages,
+  }
+}
+
+export async function deleteChatConversation(
+  conversationId: string,
+): Promise<void> {
+  await requestConversation(conversationId, 'DELETE')
 }
 
 /**

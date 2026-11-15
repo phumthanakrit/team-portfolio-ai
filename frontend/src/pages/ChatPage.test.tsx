@@ -107,6 +107,7 @@ async function sendMessage(
 
 beforeEach(() => {
   mockSendChatMessage.mockReset()
+  window.localStorage.removeItem('team-portfolio-ai-chat-history-v1')
 
   // JSDOM does not implement scrollIntoView.
   Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
@@ -148,8 +149,24 @@ describe('ChatPage Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText('รอการเชื่อมต่อ Backend'),
+      screen.getByRole('button', {
+        name: 'ประวัติแชต',
+      }),
     ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('GOOGLE GEMINI'),
+    ).toBeInTheDocument()
+  })
+
+  it('should open the Thai conversation history panel', async () => {
+    const user = userEvent.setup()
+
+    renderChatPage('th')
+
+    await user.click(screen.getByRole('button', { name: 'ประวัติแชต' }))
+
+    expect(screen.getByText('ยังไม่มีประวัติแชตในเบราว์เซอร์นี้')).toBeInTheDocument()
   })
 
   it('should use Thai suggested prompts', async () => {

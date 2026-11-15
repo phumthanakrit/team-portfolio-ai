@@ -87,3 +87,35 @@ HTTP 500 Internal Server Error
 3. Display user and assistant messages.
 4. Display loading and error states.
 5. Handle network and server errors.
+
+## 8. Conversation History
+
+The frontend stores conversation IDs in the current browser. The browser requests a conversation by ID when the user opens it.
+
+GET /api/chat/conversations/{conversationId}
+
+HTTP 200 OK
+
+{
+  "conversationId": "uuid",
+  "messages": [
+    {
+      "id": "1",
+      "role": "assistant",
+      "content": "Hello.",
+      "createdAt": "2026-11-15T12:00:00.000Z"
+    }
+  ]
+}
+
+DELETE /api/chat/conversations/{conversationId}
+
+HTTP 204 No Content
+
+Deleting a conversation also deletes its messages. Conversation IDs are kept in the browser that created them; there is no global conversation-list endpoint.
+
+## 9. Portfolio Data Source
+
+Portfolio projects are maintained in `frontend/src/data/portfolioData.ts`, not through chat API mutations. Each of the three members has three project slots with bilingual title and details fields and an optional `coverImage` path. Add image assets manually under `frontend/public/images/projects/`; the website has no image-upload control.
+
+The backend builds Gemini's verified portfolio context from this data module. Empty project slots and members still marked as placeholders are excluded. There are no API endpoints for adding, editing, or deleting portfolio data.
