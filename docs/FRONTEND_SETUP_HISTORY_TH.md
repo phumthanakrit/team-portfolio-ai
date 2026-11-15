@@ -205,32 +205,175 @@ Stage เฉพาะ `README.md` และตรวจ `git diff --cached --che
 
 Push Commit `27a66ae` ไป `origin/main` ตรวจ Local/Remote commit hash ตรงกัน, Branch status เป็น `main...origin/main` และยืนยันว่า Root README แสดงบน GitHub แล้ว
 
-## 36. สถานะหลัง Step 35
+## Phase H — KUAi Frontend Enhancement และ Quality Assurance
 
-| รายการ | สถานะยืนยันล่าสุด |
+หลังจาก Step 35 ได้มีการพัฒนาและปรับปรุง Frontend ต่อเนื่อง โดยรักษาโครงสร้าง React + TypeScript + Vite เดิมไว้ ไม่ได้เริ่มโครงการใหม่
+
+### Step 36.1 — ปรับ Branding, Favicon และ SEO Metadata
+
+ปรับภาพลักษณ์ผลิตภัณฑ์เป็น **KUAi — Know Us. Ask AI.**
+
+ไฟล์ที่เกี่ยวข้อง:
+
+- `frontend/index.html`
+- `frontend/public/favicon.svg`
+
+สิ่งที่เปลี่ยนแปลง:
+
+- เปลี่ยน Page Title เป็น `KUAi | Know Us. Ask AI.`
+- เพิ่ม Meta Description และ Robots Metadata
+- เพิ่ม Open Graph Metadata สำหรับ Social Sharing
+- เพิ่ม Twitter/X Metadata
+- เปลี่ยน Vite Starter Favicon เป็น KUAi Favicon
+
+### Step 36.2 — เพิ่ม English / Thai Support ใน Chat UI
+
+ปรับ Chat Components ให้ใช้ Language Context เดิมของโปรเจกต์
+
+ไฟล์ที่เกี่ยวข้อง:
+
+- `frontend/src/components/chat/MessageBubble.tsx`
+- `frontend/src/components/chat/MessageBubble.test.tsx`
+- `frontend/src/components/chat/TypingIndicator.tsx`
+- `frontend/src/components/chat/TypingIndicator.test.tsx`
+- `frontend/src/pages/ChatPage.test.tsx`
+
+สิ่งที่เปลี่ยนแปลง:
+
+- รองรับ User/Assistant Labels ทั้ง EN และ TH
+- รองรับ Typing Indicator ทั้ง EN และ TH
+- เพิ่ม Automated Tests สำหรับข้อความทั้งสองภาษา
+- เพิ่ม ChatPage Integration Test สำหรับ Thai Typing Indicator
+
+ผลการทดสอบเฉพาะส่วนที่เกี่ยวข้องผ่านครบ
+
+### Step 36.3 — ปรับ Unicode Character Counter
+
+ปรับ `ChatComposer.tsx` จากการนับด้วย UTF-16 string length เป็น `Intl.Segmenter` เพื่อแบ่งข้อความตาม Grapheme Clusters
+
+ไฟล์ที่เกี่ยวข้อง:
+
+- `frontend/src/components/chat/ChatComposer.tsx`
+- `frontend/src/components/chat/ChatComposer.test.tsx`
+
+สิ่งที่เปลี่ยนแปลง:
+
+- นับข้อความภาษาไทยตาม Grapheme Clusters
+- รองรับ Combined Emoji
+- จำกัดข้อความสูงสุด 2,000 Grapheme Clusters
+- รองรับการตรวจสอบข้อความที่ถูก Paste เกินขีดจำกัด
+
+เพิ่ม Automated Tests สำหรับ Thai Grapheme Count, Combined Emoji และ Maximum Message Length
+
+### Step 36.4 — เพิ่ม Project Image Fallback
+
+สร้าง `ProjectCover.tsx` เพื่อแยกการแสดงภาพหน้าปกโครงการออกจาก Project Card
+
+ไฟล์ที่เกี่ยวข้อง:
+
+- `frontend/src/components/portfolio/ProjectCover.tsx`
+- `frontend/src/components/portfolio/TeamProjectSection.tsx`
+- `frontend/src/components/portfolio/TeamProjectSection.test.tsx`
+
+สิ่งที่เปลี่ยนแปลง:
+
+- แสดง Placeholder เมื่อไม่มี `coverImage`
+- ใช้ `onError` เมื่อรูปภาพโหลดไม่สำเร็จ
+- รักษา Gradient Background และ Layout เดิม
+- รองรับข้อความ Placeholder ภาษาอังกฤษและภาษาไทย
+
+เพิ่ม Automated Tests สำหรับกรณีไม่มีรูปภาพและกรณีรูปภาพโหลดไม่สำเร็จ
+
+### Step 36.5 — Cleanup Vite Starter Assets
+
+ตรวจสอบ Import, References และ Git Tracking ก่อนลบไฟล์ที่ไม่ใช้งาน
+
+ไฟล์ที่ลบ:
+
+- `frontend/src/App.css`
+- `frontend/src/assets/react.svg`
+- `frontend/src/assets/vite.svg`
+- `frontend/public/icons.svg`
+
+ไฟล์ที่เก็บไว้:
+
+- `frontend/src/index.css`
+- `frontend/src/assets/hero.png`
+- `frontend/public/favicon.svg`
+
+หลัง Cleanup ตรวจสอบด้วย Git References Search, Production Build, Automated Tests, ESLint และ Production Preview
+
+### Step 36.6 — ปรับปรุง Project Documentation
+
+ปรับเอกสารให้ตรงกับ Branding, Architecture และสถานะปัจจุบันของ KUAi
+
+ไฟล์ที่เกี่ยวข้อง:
+
+- `README.md`
+- `frontend/README.md`
+- `docs/PROJECT_OVERVIEW_TH.md`
+- `docs/FRONTEND_FILE_MAP_TH.md`
+- `docs/FRONTEND_SETUP_HISTORY_TH.md`
+
+เพิ่มเติมเนื้อหาเกี่ยวกับ Bilingual Support, Unicode Character Counter, Project Image Fallback, Static Asset Cleanup และสถานะ Backend Integration
+
+---
+
+## 37. สถานะหลัง KUAi Frontend Enhancement
+
+### ผลการตรวจสอบล่าสุดจาก Local Development
+
+| รายการ | สถานะ |
 |---|---|
-| React + TypeScript + Vite frontend | Implemented |
-| Group Portfolio UI | Implemented; data ยังเป็นตัวอย่าง |
-| Chat UI | Implemented |
-| API client + contract | Implemented/documented |
-| Automated Tests | 25/25 passed |
+| React + TypeScript + Vite Frontend | Implemented |
+| KUAi Branding และ Favicon | Implemented |
+| SEO และ Social Sharing Metadata | Implemented |
+| Group Portfolio UI | Implemented |
+| English / Thai Language Support | Implemented |
+| Interactive Chat UI | Implemented |
+| Unicode-aware Character Counter | Implemented |
+| Project Image Fallback | Implemented |
+| Frontend Chat API Client | Implemented |
+| Chat API Contract | Documented |
+| Automated Tests | 65/65 Passed |
+| Test Files | 12/12 Passed |
 | ESLint | Passed |
+| TypeScript Check | Passed |
 | Production Build | Passed |
-| Production Preview | Passed |
-| GitHub Actions Frontend CI | Passed |
-| GitHub Repository | Private, `main` branch |
-| Root README | Pushed and visible |
-| Express Backend | In development / not verified complete |
-| PostgreSQL integration | Pending |
-| Real AI integration | Pending |
-| Production deployment | Pending |
+| Local Production Preview | Passed |
+| Static Asset Cleanup | Completed |
+| Git Whitespace Check | Passed |
 
-## 37. แนวทางเพิ่มประวัติในอนาคต
+### Production และ Integration Status
 
-เมื่อทำงานต่อจาก Step 36 ให้เพิ่มหัวข้อใหม่ท้ายเอกสาร เช่น:
+| รายการ | สถานะ |
+|---|---|
+| Existing Production Website | Deployed |
+| Production URL | https://team-portfolio-ai.vercel.app/ |
+| Latest Local Changes | Not yet deployed |
+| Latest Changes Git Commit | Pending |
+| Latest Changes GitHub Push | Pending |
+| GitHub Actions for Latest Local Changes | Not yet verified |
+| Express Backend | Pending Integration |
+| PostgreSQL Integration | Pending |
+| Live AI Model Integration | Pending |
+| Persistent Conversation History | Pending |
+| Authentication / Authorization | Not yet implemented / verified |
+
+**ข้อควรระวัง:** Production Preview เป็นการทดสอบ Local Production Build ไม่ใช่การยืนยันว่า Local Changes ถูก Deploy ขึ้น Production แล้ว
+
+ผล GitHub Actions ที่เคยยืนยันสำหรับ Commit `574f8bd` และ `27a66ae` เป็นผลของ Commit ในอดีต ไม่ใช่ผล CI สำหรับการแก้ไข Local รอบล่าสุด
+
+---
+
+## 38. แนวทางเพิ่มประวัติในอนาคต
+
+หลัง Step 36 ให้เริ่มบันทึกงานใหม่ด้วย Step 37 เป็นต้นไป
+
+ใช้ Template:
 
 ```markdown
-### Step 36 — [ชื่อขั้นตอน]
+### Step 37 — [ชื่อขั้นตอน]
 
 - ไฟล์ที่แก้:
 - เหตุผล:
@@ -240,4 +383,6 @@ Push Commit `27a66ae` ไป `origin/main` ตรวจ Local/Remote commit hash
 - Commit hash (ถ้ามี):
 ```
 
-บันทึกเฉพาะผลที่ทำจริงและตรวจสอบแล้ว อย่าระบุว่า integration/deployment ผ่าน หากยังไม่ได้ทดสอบในสภาพแวดล้อมจริง
+บันทึกเฉพาะงานที่ดำเนินการและตรวจสอบแล้วเท่านั้น
+
+ไม่ควรระบุว่า Backend, Database, Live AI Integration หรือ Production Deployment ผ่าน หากยังไม่ได้ทดสอบในสภาพแวดล้อมจริง

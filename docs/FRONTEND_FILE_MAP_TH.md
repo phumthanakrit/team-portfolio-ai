@@ -7,27 +7,37 @@
 ```text
 src/main.tsx
    |
-   v
-src/App.tsx
+   +--> LanguageProvider
+   |       +--> LanguageContext
+   |       +--> Local Storage (EN / TH)
    |
-   +--> Portfolio route (/)
-   |       |
-   |       +--> PortfolioPage.tsx
-   |               +--> Navbar.tsx
-   |               +--> TeamHero.tsx
-   |               +--> MemberSection.tsx
-   |               |      +--> MemberCard.tsx
-   |               +--> TeamContact.tsx
-   |               +--> portfolioData.ts
-   |
-   +--> Chat route (/chat)
+   +--> BrowserRouter
            |
-           +--> ChatPage.tsx
-                   +--> MessageBubble.tsx
-                   +--> TypingIndicator.tsx
-                   +--> ChatComposer.tsx
-                   +--> chatApi.ts
-                          +--> POST /api/chat
+           v
+       src/App.tsx
+           |
+           +--> Portfolio route (/)
+           |       |
+           |       +--> PortfolioPage.tsx
+           |               +--> Navbar.tsx
+           |               +--> TeamHero.tsx
+           |               +--> TeamIntroduction.tsx
+           |               +--> MemberSection.tsx
+           |               |       +--> MemberCard.tsx
+           |               +--> TeamProjectSection.tsx
+           |               |       +--> ProjectCover.tsx
+           |               +--> TeamContact.tsx
+           |               +--> portfolioData.ts
+           |
+           +--> Chat route (/chat)
+                   |
+                   +--> ChatPage.tsx
+                           +--> Navbar.tsx
+                           +--> MessageBubble.tsx
+                           +--> TypingIndicator.tsx
+                           +--> ChatComposer.tsx
+                           +--> chatApi.ts
+                                  +--> POST /api/chat
 ```
 
 ## 2. Root-level files
@@ -61,10 +71,9 @@ src/App.tsx
 
 | Path | หน้าที่ |
 |---|---|
-| `frontend/src/main.tsx` | Entry point ของ React; เตรียม DOM root และ providers ระดับแอป เช่น Router |
-| `frontend/src/App.tsx` | กำหนด App shell และเส้นทางหน้า Portfolio (`/`) กับ Chat (`/chat`) รวม fallback route |
-| `frontend/src/App.css` | CSS ของ App ที่ยังคงอยู่ในโปรเจกต์; ก่อนแก้ควรค้นหาว่า selector ใดถูกใช้อยู่ |
-| `frontend/src/index.css` | Global CSS, Tailwind import และ design tokens/theme ที่ใช้ร่วมกัน |
+| `frontend/src/main.tsx` | React entry point; ติดตั้ง StrictMode, LanguageProvider และ BrowserRouter |
+| `frontend/src/App.tsx` | กำหนด Route สำหรับ Portfolio (`/`) และ Chat (`/chat`) รวมถึง fallback route |
+| `frontend/src/index.css` | Global CSS, Tailwind CSS 4 import, design tokens, theme และ global styles |
 
 ### 4.2 Portfolio page และ components
 
@@ -77,7 +86,11 @@ src/App.tsx
 | `frontend/src/components/portfolio/MemberCard.tsx` | การ์ดข้อมูลสมาชิกและการจัดกลุ่ม Skills ตาม Role | Member type/skill data |
 | `frontend/src/components/portfolio/TeamContact.tsx` | แสดงช่องทางติดต่อและลิงก์ที่เกี่ยวข้อง | contact data |
 | `frontend/src/data/portfolioData.ts` | แหล่งข้อมูล Portfolio แบบ typed เช่น ข้อมูลกลุ่ม สมาชิก ทักษะ Contact และ helper สำหรับสร้าง Portfolio context | ปัจจุบันมีข้อมูลตัวอย่าง ต้องแทนด้วยข้อมูลที่ทีมอนุมัติ |
+| `frontend/src/components/portfolio/TeamIntroduction.tsx` | แสดงบทนำและข้อมูลแนะนำทีม | `portfolioData.ts` |
+| `frontend/src/components/portfolio/TeamProjectSection.tsx` | แสดงผลงานโครงการของทีม พร้อมข้อมูลประเภท สถานะ เทคโนโลยี และ Features | `teamProjects` จาก `portfolioData.ts` |
+| `frontend/src/components/portfolio/ProjectCover.tsx` | แสดงภาพหน้าปกโครงการ และ Placeholder เมื่อไม่มีภาพหรือโหลดภาพไม่สำเร็จ | `coverImage` และข้อความภาษา EN/TH |
 
+**Project Image Fallback:** `ProjectCover.tsx` รองรับทั้งกรณีไม่มี `coverImage` และกรณีรูปภาพโหลดไม่สำเร็จ โดยแสดง Placeholder แทน Broken Image
 **เมื่อต้องแก้ข้อมูลสมาชิก:** เริ่มที่ `portfolioData.ts` ก่อน อย่าใส่ชื่อ/ทักษะ/URL ซ้ำใน Component หากข้อมูลนั้นควรมาจาก data source กลาง
 
 ### 4.3 Chat components และ page
@@ -93,29 +106,56 @@ src/App.tsx
 
 **ขอบเขตสำคัญ:** `ChatPage.tsx` เป็น UI/state orchestration; `chatApi.ts` เป็นชั้น HTTP service; Backend ไม่ควรต้องรู้รายละเอียดการจัดวาง UI ของ React
 
-### 4.4 Assets และ public files
+### 4.4 Context และ Language Management
 
 | Path | หน้าที่ |
 |---|---|
-| `frontend/src/assets/hero.png` | รูปภาพ Hero ที่ import จาก source code |
-| `frontend/src/assets/react.svg` | Asset ตัวอย่าง React ที่อยู่ในโปรเจกต์ |
-| `frontend/src/assets/vite.svg` | Asset ตัวอย่าง Vite ที่อยู่ในโปรเจกต์ |
-| `frontend/public/favicon.svg` | Favicon สำหรับหน้าเว็บ |
-| `frontend/public/icons.svg` | ไฟล์ SVG icons ที่เสิร์ฟจาก public directory |
+| `frontend/src/contexts/LanguageProvider.tsx` | จัดการภาษา EN/TH, บันทึกภาษาที่เลือกใน Local Storage และอัปเดต document language |
+| `frontend/src/contexts/language-context.ts` | สร้าง Language Context และ `useLanguage()` Hook สำหรับ Components |
+| `frontend/src/data/portfolioData.ts` | แหล่งข้อมูล Portfolio แบบ Typed รวมถึงข้อมูลกลุ่ม สมาชิก ทักษะ และผลงาน |
 
-ไฟล์ `react.svg` และ `vite.svg` เป็นไฟล์ตัวอย่างจาก scaffolding; ก่อนลบควรค้นหา references ว่ายังถูกใช้งานหรือไม่
+**แนวทางใช้งาน:** Components ที่ต้องแสดงข้อความสองภาษาให้ใช้ `useLanguage()` และรูปแบบ Localized Content ที่มีอยู่ ไม่ควรสร้างระบบจัดการภาษาแยกภายใน Component
 
-## 5. Test files และสิ่งที่ทดสอบ
+### 4.5 Assets และ public files
 
-| Test file | ขอบเขตทดสอบ | จำนวนที่ยืนยันล่าสุด |
+| Path | หน้าที่ |
+|---|---|
+| `frontend/src/assets/hero.png` | รูปภาพ Hero ที่จัดเก็บใน Source Assets |
+| `frontend/public/favicon.svg` | KUAi Favicon ที่ Browser ใช้แสดงเป็นไอคอนเว็บไซต์ |
+
+
+## 5. Test Files และสิ่งที่ทดสอบ
+
+ปัจจุบันมี Automated Tests รวม 12 Test Files และ 65 Tests ผ่านจาก Local Development
+
+| Test file | ขอบเขตทดสอบ | จำนวน |
 |---|---|---:|
 | `frontend/src/services/chatApi.test.ts` | API success/error, validation และ timeout | 9 |
-| `frontend/src/components/chat/MessageBubble.test.tsx` | แสดงข้อความ user/assistant และ timestamp | 3 |
-| `frontend/src/components/chat/ChatComposer.test.tsx` | input, send, Enter, Shift+Enter และ loading/disabled state | 7 |
-| `frontend/src/pages/ChatPage.test.tsx` | empty state, prompt, success, loading, error/retry, conversation ID และ New Chat | 6 |
-| **รวม** | | **25** |
+| `frontend/src/contexts/LanguageProvider.test.tsx` | Language Provider และการจัดการภาษา | 5 |
+| `frontend/src/components/chat/MessageBubble.test.tsx` | User/Assistant Labels ภาษา EN/TH และ Timestamp | 5 |
+| `frontend/src/components/chat/TypingIndicator.test.tsx` | Typing Indicator ภาษา EN/TH | 2 |
+| `frontend/src/components/chat/ChatComposer.test.tsx` | Input, Send, Keyboard, Loading, Thai Grapheme และ Emoji Count | 11 |
+| `frontend/src/components/portfolio/TeamIntroduction.test.tsx` | Team Introduction | 4 |
+| `frontend/src/components/portfolio/TeamProjectSection.test.tsx` | Project Section, EN/TH และ Project Image Fallback | 5 |
+| `frontend/src/components/portfolio/MemberCard.test.tsx` | Member Card | 6 |
+| `frontend/src/components/portfolio/MemberSection.test.tsx` | Member Section | 3 |
+| `frontend/src/components/portfolio/TeamContact.test.tsx` | Team Contact | 4 |
+| `frontend/src/pages/PortfolioPage.test.tsx` | Portfolio Page | 2 |
+| `frontend/src/pages/ChatPage.test.tsx` | Chat Page, Thai UI, API Loading, Error, Retry และ Conversation | 9 |
+| **รวม** | **12 Test Files** | **65** |
 
-เมื่อเปลี่ยน Component หรือ service ที่มี test อยู่ ให้แก้/เพิ่ม test ที่เกี่ยวข้องในไฟล์คู่กัน และรัน:
+### Unicode Character Counter
+
+`ChatComposer.tsx` ใช้ `Intl.Segmenter` เพื่อแบ่งข้อความเป็น Grapheme Clusters แทนการใช้ UTF-16 string length
+
+- ภาษาไทยนับตาม Grapheme Clusters
+- Combined Emoji สามารถนับเป็นหนึ่ง Grapheme Cluster
+- จำกัดข้อความสูงสุด 2,000 Grapheme Clusters
+- รองรับการตรวจสอบการ Paste ข้อความเกินขีดจำกัด
+
+### วิธีทดสอบหลังแก้ไข Component
+
+รันภายใน `frontend/`:
 
 ```bash
 npm run test
@@ -154,6 +194,10 @@ VITE_API_BASE_URL=
 | เปลี่ยน proxy หรือ Vitest config | `vite.config.ts` |
 | เพิ่ม dependency หรือ script | `package.json` แล้วตรวจ `package-lock.json` |
 | เปลี่ยน CI checks | `.github/workflows/frontend-ci.yml` |
+| ปรับภาษา EN/TH | `contexts/LanguageProvider.tsx`, `contexts/language-context.ts` และ Component ที่เกี่ยวข้อง |
+| ปรับ Project Showcase หรือข้อมูลโครงการ | `components/portfolio/TeamProjectSection.tsx` และ `data/portfolioData.ts` |
+| ปรับ Project Image Fallback | `components/portfolio/ProjectCover.tsx` และ `TeamProjectSection.test.tsx` |
+| ปรับ Unicode Character Counter | `components/chat/ChatComposer.tsx` และ `ChatComposer.test.tsx` |
 
 ## 8. สิ่งที่ไม่ควรทำ
 

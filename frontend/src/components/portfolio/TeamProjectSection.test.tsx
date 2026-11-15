@@ -3,11 +3,17 @@
 import '@testing-library/jest-dom/vitest'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
-import { within } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
 import TeamProjectSection from './TeamProjectSection'
+import ProjectCover from './ProjectCover'
 
 type TestLanguage = 'en' | 'th'
 
@@ -108,6 +114,45 @@ describe('TeamProjectSection Component', () => {
       within(projectCard!).getByText(
         'Interactive chat interface with loading and error states',
       ),
+    ).toBeInTheDocument()
+  })
+
+    it('should display a fallback when no cover image is provided', () => {
+    render(
+      <ProjectCover
+        alt="Project preview"
+        fallbackLabel="No preview image"
+      />,
+    )
+
+    expect(
+      screen.getByText('No preview image'),
+    ).toBeInTheDocument()
+  })
+
+  it('should display a fallback when the cover image fails to load', () => {
+    render(
+      <ProjectCover
+        coverImage="/images/projects/broken-image.webp"
+        alt="Project preview"
+        fallbackLabel="No preview image"
+      />,
+    )
+
+    const image = screen.getByRole('img', {
+      name: 'Project preview',
+    })
+
+    fireEvent.error(image)
+
+    expect(
+      screen.queryByRole('img', {
+        name: 'Project preview',
+      }),
+    ).not.toBeInTheDocument()
+
+    expect(
+      screen.getByText('No preview image'),
     ).toBeInTheDocument()
   })
 })

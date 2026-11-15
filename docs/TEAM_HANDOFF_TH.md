@@ -10,7 +10,7 @@
 | Backend | มี API contract ที่ Frontend คาดหวังและ Vite proxy target `localhost:3000` | สร้าง Express server, implement `POST /api/chat`, validation, error handling, AI provider connection |
 | Database | PostgreSQL เป็นฐานข้อมูลที่วางแผนไว้ | ออกแบบ schema/migration, persistence, indexes, retention และ integration กับ Backend |
 | AI integration | มี Chat UI และ API request flow | เลือก provider/model, prompt/context policy, backend-only secret, error/rate limit handling |
-| Deployment | มี Frontend production build และ CI | เลือก hosting, ตั้ง environment variables, configure CORS/HTTPS, deploy และ smoke test |
+| Deployment | มีเว็บไซต์เดิมบน Production แล้ว: https://team-portfolio-ai.vercel.app/ และมี Frontend production build ที่ผ่านการตรวจสอบใน Local ล่าสุด | Local changes ล่าสุดยังไม่ได้ Commit, Push หรือ Deploy ต้องตรวจสอบ Vercel build, environment variables, CORS/HTTPS และ smoke test หลังได้รับอนุมัติให้นำขึ้น Production |
 
 อย่าสรุปว่าส่วน Backend/Database/AI เสร็จแล้วจากเอกสาร Frontend นี้ เอกสารนี้เป็นข้อตกลงฝั่ง Client ที่ Backend ต้อง implement ให้สอดคล้อง หรือเสนอเปลี่ยน contract ผ่านการคุยกับทีมก่อน
 
@@ -58,7 +58,7 @@ Content-Type: application/json
 ### สิ่งที่ Frontend client ทำอยู่
 
 - เรียก `POST /api/chat` ด้วย JSON
-- ตรวจ `message` ว่ามีข้อความและไม่เกิน 2,000 ตัวอักษร
+- ตรวจ `message` ว่ามีข้อความและไม่เกิน 2,000 Unicode grapheme clusters โดยใช้ Shared Utility กลางสำหรับนับและจำกัดความยาวข้อความ
 - ตรวจ `conversationId` หากมีค่า
 - กำหนด timeout 30 วินาทีด้วย AbortController
 - จัดการ Network, HTTP และ invalid response errors
@@ -77,7 +77,11 @@ Content-Type: application/json
 8. กำหนด CORS/HTTPS/rate limiting ตาม environment ที่ deploy
 9. เพิ่ม Backend tests สำหรับ validation, success, provider failure และ database failure
 
-> ความยาวข้อความ 2,000 ตัวอักษรและ timeout 30 วินาทีเป็นค่าที่ Frontend ใช้อยู่ ณ ตอนจัดทำเอกสาร ควรคุยกันก่อนเปลี่ยนค่าให้เป็นมาตรฐานร่วม
+> ข้อกำหนดกลางของ Chat API กำหนดความยาวสูงสุด 2,000 Unicode grapheme clusters โดย Frontend ใช้ Shared Utility กลางสำหรับตรวจสอบข้อความ ส่วน Backend ต้อง implement และตรวจสอบข้อจำกัดเดียวกันอย่างอิสระก่อนประมวลผลคำขอ
+>
+> Frontend กำหนด request timeout ไว้ที่ 30 วินาทีด้วย AbortController ทั้งนี้ไม่ได้รับประกันว่า Backend จะหยุดประมวลผลเมื่อ Client timeout
+>
+> รายละเอียด request/response และ validation อ้างอิงจาก `docs/chat-api-contract.md`
 
 ## 3. ข้อแนะนำสำหรับ Database Member
 
@@ -201,4 +205,4 @@ Backend ควรเปิดรับคำขอที่ port `3000` ใน L
 - `docs/chat-api-contract.md` — contract ที่ Frontend ใช้อยู่
 - `docs/PROJECT_OVERVIEW_TH.md` — ภาพรวมและการเริ่มต้นใช้งาน
 - `docs/FRONTEND_FILE_MAP_TH.md` — หน้าที่ของแต่ละไฟล์
-- `docs/FRONTEND_SETUP_HISTORY_TH.md` — ขั้นตอนที่ทำตั้งแต่ Step 01–35
+- `docs/FRONTEND_SETUP_HISTORY_TH.md` — ประวัติการพัฒนา Frontend ตั้งแต่ Step 01–36 รวม Phase H และ Step 36.1–36.6

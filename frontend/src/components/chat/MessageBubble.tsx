@@ -1,13 +1,35 @@
 
 import { Sparkles, UserRound } from 'lucide-react'
 
+import { useLanguage } from '../../contexts/language-context'
+
+import type { Language } from '../../data/portfolioData'
 import type { ChatMessage } from '../../types/chat'
 
 interface MessageBubbleProps {
   message: ChatMessage
 }
 
+interface MessageBubbleCopy {
+  user: string
+  assistant: string
+}
+
+const messageBubbleCopy: Record<Language, MessageBubbleCopy> = {
+  en: {
+    user: 'You',
+    assistant: 'Team AI',
+  },
+  th: {
+    user: 'คุณ',
+    assistant: 'ผู้ช่วย AI',
+  },
+}
+
 function MessageBubble({ message }: MessageBubbleProps) {
+  const { language } = useLanguage()
+  const copy = messageBubbleCopy[language]
+
   const isUser = message.role === 'user'
 
   const formattedTime = new Date(
@@ -42,7 +64,7 @@ function MessageBubble({ message }: MessageBubbleProps) {
         }`}
       >
         <span className="px-1 text-[11px] font-medium text-slate-500">
-          {isUser ? 'You' : 'Team AI'}
+          {isUser ? copy.user : copy.assistant}
         </span>
 
         <div
@@ -75,7 +97,6 @@ function MessageBubble({ message }: MessageBubbleProps) {
           <UserRound size={17} />
         </div>
       )}
-
     </div>
   )
 }

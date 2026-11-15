@@ -1,7 +1,9 @@
 
-# Team Portfolio AI
+# KUAi — Know Us. Ask AI.
 
-AIE312 Final Project — Team Portfolio and AI Chat Application
+**Team Portfolio AI | AIE312 Final Project**
+
+A bilingual team portfolio and AI chat application that introduces our team, showcases collaborative projects, and provides an interactive chat interface.
 
 A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API and PostgreSQL planned for backend and database integration.
 
@@ -10,16 +12,29 @@ A web application that presents our team portfolio and provides an AI-powered ch
 | Component | Status |
 |---|---|
 | React + TypeScript Frontend | Implemented |
-| Group Portfolio Page | Implemented (sample data) |
+| Group Portfolio Page | Implemented |
+| English / Thai Language Support | Implemented |
 | Interactive Chat UI | Implemented |
+| Unicode-aware Character Counter | Implemented |
+| Project Image Fallback | Implemented |
 | Frontend API Service | Implemented |
 | Chat API Contract | Documented |
-| Frontend Unit and Component Tests | 25 tests passing |
-| GitHub Actions Frontend CI | Passing |
-| Express Backend | In development |
+| Frontend Automated Tests | 65 tests passing |
+| ESLint | Passing |
+| Production Build | Verified |
+| GitHub Actions Frontend CI | Configured |
+| Production Website | Deployed (existing version) |
+| Latest Local Changes | Not yet deployed |
+| Express Backend | Pending Integration |
 | PostgreSQL Integration | Pending |
-| AI Model Integration | Pending |
-| Production Deployment | Pending |
+| Live AI Model Integration | Pending |
+
+## Project Branding
+
+- Product Name: KUAi
+- Tagline: Know Us. Ask AI.
+- Team Name: KNOW US. ASK AI.
+- Production Website: https://team-portfolio-ai.vercel.app/
 
 > The Chat UI is implemented, but real AI responses and persistent chat history are not available until the backend and database are integrated.
 
