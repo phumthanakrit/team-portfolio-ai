@@ -348,25 +348,28 @@ export const portfolioData: PortfolioData = {
       },
       projects: [
         {
-          id: 'member-1-sample-project-1',
-          title: {
-            en: 'E-Commerce Minimalist Dashboard',
-            th: 'แดชบอร์ด E-Commerce แบบมินิมอล',
-          },
-          description: {
-            en: 'A clean analytics dashboard for online store owners, featuring responsive charts, order tracking and a fast, accessible interface.',
-            th: 'แดชบอร์ดวิเคราะห์ข้อมูลสำหรับร้านค้าออนไลน์ พร้อมกราฟที่รองรับหน้าจอหลายขนาด ระบบติดตามคำสั่งซื้อ และส่วนติดต่อที่ใช้งานง่าย',
-          },
-          projectType: {
-            en: 'Web Application',
-            th: 'เว็บแอปพลิเคชัน',
-          },
-          technologies: ['React', 'TypeScript'],
+          id: 'member-1-project-1',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
           coverImage: undefined,
-          gallery: [],
-          repositoryUrl: undefined,
-          demoUrl: undefined,
-          isPlaceholder: true,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-1-project-2',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-1-project-3',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
         },
       ],
       isPlaceholder: true,
@@ -438,25 +441,28 @@ export const portfolioData: PortfolioData = {
       },
       projects: [
         {
-          id: 'member-2-sample-project-1',
-          title: {
-            en: 'Task Management API Service',
-            th: 'บริการ API สำหรับจัดการงาน',
-          },
-          description: {
-            en: 'A RESTful service for projects, tasks and teams with JWT authentication, role-based access and a normalized PostgreSQL schema.',
-            th: 'บริการ RESTful สำหรับจัดการโปรเจกต์ งาน และทีม พร้อมตัวอย่างการยืนยันตัวตนด้วย JWT การกำหนดสิทธิ์ตามบทบาท และโครงสร้าง PostgreSQL ที่ผ่านการ Normalization',
-          },
-          projectType: {
-            en: 'Backend API',
-            th: 'Backend API',
-          },
-          technologies: ['Node.js', 'Express', 'PostgreSQL'],
+          id: 'member-2-project-1',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
           coverImage: undefined,
-          gallery: [],
-          repositoryUrl: undefined,
-          demoUrl: undefined,
-          isPlaceholder: true,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-2-project-2',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-2-project-3',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
         },
       ],
       isPlaceholder: true,
@@ -518,25 +524,28 @@ export const portfolioData: PortfolioData = {
       },
       projects: [
         {
-          id: 'member-3-sample-project-1',
-          title: {
-            en: 'Automated Cloud Deployment Script',
-            th: 'สคริปต์สำหรับ Deploy ระบบขึ้น Cloud อัตโนมัติ',
-          },
-          description: {
-            en: 'A scripted pipeline that provisions a Linux server, builds Docker images and performs zero-downtime releases behind Nginx.',
-            th: 'Pipeline Script สำหรับเตรียม Linux Server สร้าง Docker Images และ Deploy ระบบผ่าน Nginx โดยลดช่วงเวลาที่ระบบหยุดให้บริการ',
-          },
-          projectType: {
-            en: 'DevOps Automation',
-            th: 'ระบบอัตโนมัติด้าน DevOps',
-          },
-          technologies: ['Docker', 'Linux', 'Nginx'],
+          id: 'member-3-project-1',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
           coverImage: undefined,
-          gallery: [],
-          repositoryUrl: undefined,
-          demoUrl: undefined,
-          isPlaceholder: true,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-3-project-2',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
+        },
+        {
+          id: 'member-3-project-3',
+          title: { en: '', th: '' },
+          description: { en: '', th: '' },
+          technologies: [],
+          coverImage: undefined,
+          isPlaceholder: false,
         },
       ],
       isPlaceholder: true,
@@ -702,7 +711,9 @@ export const buildPortfolioContext = (
     );
 
     const verifiedPersonalProjects = member.projects.filter(
-      (project) => !project.isPlaceholder,
+      (project) =>
+        !project.isPlaceholder &&
+        Boolean(project.title.en.trim() || project.title.th.trim()),
     );
     if (verifiedPersonalProjects.length === 0) {
       lines.push('  Verified individual projects: None provided yet.');

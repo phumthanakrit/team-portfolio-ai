@@ -5,7 +5,7 @@
 
 A bilingual team portfolio and AI chat application that introduces our team, showcases collaborative projects, and provides an interactive chat interface.
 
-A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API and PostgreSQL planned for backend and database integration.
+A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, PostgreSQL persistence, and Google Gemini integration in the backend.
 
 ## Project Status
 
@@ -19,24 +19,25 @@ A web application that presents our team portfolio and provides an AI-powered ch
 | Project Image Fallback | Implemented |
 | Frontend API Service | Implemented |
 | Chat API Contract | Documented |
+
 | Frontend Automated Tests | 65 tests passing |
 | ESLint | Passing |
 | Production Build | Verified |
-| GitHub Actions Frontend CI | Configured |
-| Production Website | Deployed (existing version) |
-| Latest Local Changes | Not yet deployed |
-| Express Backend | Pending Integration |
-| PostgreSQL Integration | Pending |
-| Live AI Model Integration | Pending |
+| GitHub Actions Frontend CI | Passing |
+| Production Website | Deployed |
+| Express Backend | Implemented |
+| PostgreSQL Integration | Implemented (tables created on startup) |
+| Google Gemini Integration | Implemented (requires an API key) |
 
 ## Project Branding
 
 - Product Name: KUAi
 - Tagline: Know Us. Ask AI.
 - Team Name: KNOW US. ASK AI.
-- Production Website: https://team-portfolio-ai.vercel.app/
+- Production Website: https://vercel.app
 
-> The Chat UI is implemented, but real AI responses and persistent chat history are not available until the backend and database are integrated.
+
+> Chat requests require a configured backend, a running PostgreSQL database, and a Google Gemini API key.
 
 ## Technology Stack
 
@@ -51,7 +52,7 @@ A web application that presents our team portfolio and provides an AI-powered ch
 - Vitest
 - React Testing Library
 
-### Planned Backend and Database
+### Backend and Database
 
 - Node.js
 - Express
@@ -61,6 +62,8 @@ A web application that presents our team portfolio and provides an AI-powered ch
 
 ```text
 team-portfolio-ai/
+├── package.json
+├── package-lock.json
 ├── .github/
 │   └── workflows/
 │       └── frontend-ci.yml
@@ -76,13 +79,16 @@ team-portfolio-ai/
 │   │   └── types/
 │   ├── .env.example
 │   ├── package.json
+│   ├── package-lock.json
 │   └── vite.config.ts
-├── backend/             # Backend development area
-├── database/            # Database development area
+├── backend/
+│   ├── .env.example
+│   ├── package.json
+│   └── src/
+│       ├── database.ts
+│       └── server.ts
 └── README.md
 ```
-
-Empty directories are not tracked by Git until they contain files.
 
 ## Getting Started
 
@@ -99,55 +105,59 @@ git clone https://github.com/waru1549/team-portfolio-ai.git
 cd team-portfolio-ai
 ```
 
-### 2. Install Frontend Dependencies
+### 2. Install Dependencies
 
 ```bash
-cd frontend
-npm ci
+npm install
 ```
 
 ### 3. Configure Environment Variables
 
-Copy the example environment file.
+Create the backend environment file from the example.
 
 PowerShell:
 
 ```powershell
-Copy-Item .env.example .env.local
+Copy-Item backend/.env.example backend/.env
 ```
 
 macOS / Linux:
 
 ```bash
-cp .env.example .env.local
+cp backend/.env.example backend/.env
 ```
 
-The default development configuration uses the Vite proxy:
+Set `DATABASE_URL` and `GOOGLE_API_KEY` in `backend/.env`. Create the PostgreSQL database named in `DATABASE_URL` before starting the backend; it creates its tables automatically.
 
-```env
-API_PROXY_TARGET=http://localhost:3000
-VITE_API_BASE_URL=
-```
+For local development, the frontend uses the Vite proxy to connect to `http://localhost:3000` by default. No frontend environment file is required unless you need to override that configuration.
 
-Do not put API keys, passwords, or other secrets in variables prefixed with `VITE_`.
+Do not put API keys, passwords, or other secrets in frontend variables prefixed with `VITE_`.
 
-### 4. Start the Frontend
+### 4. Start Frontend and Backend
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite.
+Run this command from the repository root. It starts the Express backend on port `3000` and the Vite frontend on port `5173`; both stop when the command is stopped.
 
-> The Portfolio and Chat interfaces can be explored while the frontend runs. Chat API requests require the Express backend to be running.
+The backend requires PostgreSQL and the environment variables above. The frontend Vite proxy forwards `/api` requests to the backend.
+
+Chat history is stored in PostgreSQL and indexed in the current browser, so restarting the app keeps conversations available in that browser. Each page load starts a fresh chat. Use the history button to reopen a conversation; its three-dot menu deletes that conversation and its messages from the database.
+
+## Portfolio Project Slots
+
+Edit `frontend/src/data/portfolioData.ts`. Each member has three blank entries in `projects`; fill each entry's `title.en`, `title.th`, `description.en`, `description.th`, and optional `coverImage` path. Add image files manually under `frontend/public/images/projects/` and use a path such as `/images/projects/member-1/project-1.webp`.
+
+The three members use stable IDs `member-1`, `member-2`, and `member-3`. Update their names and profile fields in the same file. Set a member's `isPlaceholder` to `false` after its information is verified; placeholder member profiles are hidden from the portfolio page and AI context. Empty project slots are not displayed or sent to the AI. Portfolio data is edited in code only; there are no chat or website controls for adding, editing, uploading, or deleting portfolio data.
 
 ## Available Frontend Commands
 
-Run these commands inside the `frontend` directory.
+These commands are for frontend-only development and quality checks. For the full application, use `npm run dev` from the repository root.
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Start development server |
+| `npm run dev` | Start the frontend only (without the backend) |
 | `npm run lint` | Run ESLint |
 | `npm run test` | Run automated tests |
 | `npm run test:watch` | Run tests in watch mode |
@@ -187,6 +197,8 @@ The pipeline performs:
 4. Run ESLint
 5. Run Automated Tests
 6. Build Production App
+
+The CI workflow runs from `frontend/` and still uses `frontend/package-lock.json`. Local development uses the root workspace and root `package-lock.json`; the backend lockfile is not needed.
 
 ## Team Portfolio Data
 

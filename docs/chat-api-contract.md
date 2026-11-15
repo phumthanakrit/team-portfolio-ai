@@ -138,3 +138,36 @@ Note: The 30-second timeout is a Frontend request timeout. It does not by itself
 3. Unicode message-length rules must be consistent across both sides.
 4. Conversation history must use the returned conversationId.
 5. PostgreSQL persistence and real AI provider integration must be verified independently before production readiness is claimed.
+
+## 9. Conversation History
+
+The frontend stores conversation IDs in the current browser. The browser requests a conversation by ID when the user opens it.
+
+GET /api/chat/conversations/{conversationId}
+
+HTTP 200 OK
+
+{
+  "conversationId": "uuid",
+  "messages": [
+    {
+      "id": "1",
+      "role": "assistant",
+      "content": "Hello.",
+      "createdAt": "2026-11-15T12:00:00.000Z"
+    }
+  ]
+}
+
+DELETE /api/chat/conversations/{conversationId}
+
+HTTP 204 No Content
+
+Deleting a conversation also deletes its messages. Conversation IDs are kept in the browser that created them; there is no global conversation-list endpoint.
+
+## 10. Portfolio Data Source
+
+Portfolio projects are maintained in `frontend/src/data/portfolioData.ts`, not through chat API mutations. Each of the three members has three project slots with bilingual title and details fields and an optional `coverImage` path. Add image assets manually under `frontend/public/images/projects/`; the website has no image-upload control.
+
+The backend builds Gemini's verified portfolio context from this data module. Empty project slots and members still marked as placeholders are excluded. There are no API endpoints for adding, editing, or deleting portfolio data.
+

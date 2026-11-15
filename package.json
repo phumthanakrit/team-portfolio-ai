@@ -1,0 +1,14 @@
+{
+  "name": "team-portfolio-ai",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names backend,frontend \"npm run dev --workspace=team-portfolio-ai-backend\" \"npm run dev --workspace=frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

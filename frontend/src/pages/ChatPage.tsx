@@ -8,10 +8,13 @@ import {
 
 import {
   AlertCircle,
+  History,
   MessageCircle,
+  MoreHorizontal,
   Plus,
   RefreshCw,
   Sparkles,
+  Trash2,
   Users,
 } from 'lucide-react'
 
@@ -23,7 +26,12 @@ import MessageBubble from '../components/chat/MessageBubble'
 import TypingIndicator from '../components/chat/TypingIndicator'
 import ChatComposer from '../components/chat/ChatComposer'
 
-import { sendChatMessage, ChatApiException } from '../services/chatApi'
+import {
+  deleteChatConversation,
+  getChatHistory,
+  sendChatMessage,
+  ChatApiException,
+} from '../services/chatApi'
 
 import type { ChatMessage } from '../types/chat'
 
@@ -32,7 +40,11 @@ interface ChatPageCopy {
   description: string
   newChat: string
   newChatAria: string
-  backendPending: string
+  history: string
+  emptyHistory: string
+  moreActions: string
+  deleteChat: string
+  aiProvider: string
   conversationLabel: string
   messagesLabel: string
   emptyTitle: string
@@ -52,7 +64,11 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
       'Discover our team, members, skills, and projects.',
     newChat: 'New Chat',
     newChatAria: 'Start a new conversation',
-    backendPending: 'BACKEND PENDING',
+    history: 'History',
+    emptyHistory: 'No saved conversations in this browser.',
+    moreActions: 'More actions',
+    deleteChat: 'Delete conversation',
+    aiProvider: 'GOOGLE GEMINI',
     conversationLabel: 'Chat conversation',
     messagesLabel: 'Chat conversation messages',
     emptyTitle: 'How can we help you?',
@@ -67,8 +83,7 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
     errorTitle: 'Unable to get AI response',
     genericError: 'Something went wrong. Please try again.',
     retry: 'Retry',
-    disclaimer:
-      'AI responses will be handled through the Team Portfolio API after backend integration.',
+    disclaimer: 'Responses are generated with Google Gemini.',
   },
 
   th: {
@@ -77,7 +92,11 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
       'ค้นพบข้อมูลเกี่ยวกับทีม สมาชิก ทักษะ และผลงานของเรา',
     newChat: 'แชตใหม่',
     newChatAria: 'เริ่มบทสนทนาใหม่',
-    backendPending: 'รอการเชื่อมต่อ Backend',
+    history: 'ประวัติแชต',
+    emptyHistory: 'ยังไม่มีประวัติแชตในเบราว์เซอร์นี้',
+    moreActions: 'ตัวเลือกเพิ่มเติม',
+    deleteChat: 'ลบแชตนี้',
+    aiProvider: 'GOOGLE GEMINI',
     conversationLabel: 'บทสนทนา',
     messagesLabel: 'ข้อความในการสนทนา',
     emptyTitle: 'วันนี้ให้เราช่วยอะไรได้บ้าง?',
@@ -92,9 +111,40 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
     errorTitle: 'ไม่สามารถรับคำตอบจาก AI ได้',
     genericError: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
     retry: 'ลองอีกครั้ง',
-    disclaimer:
-      'ระบบจะให้บริการคำตอบจาก AI ผ่าน Team Portfolio API หลังจากเชื่อมต่อ Backend แล้ว',
+    disclaimer: 'คำตอบสร้างด้วย Google Gemini',
   },
+}
+
+const CHAT_HISTORY_STORAGE_KEY = 'team-portfolio-ai-chat-history-v1'
+
+interface SavedConversation {
+  readonly conversationId: string
+  readonly title: string
+  readonly updatedAt: string
+}
+
+function readSavedConversations(): SavedConversation[] {
+  const saved = window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
+  if (!saved) return []
+
+  try {
+    const parsed: unknown = JSON.parse(saved)
+    if (!Array.isArray(parsed)) return []
+
+    return parsed.filter((item): item is SavedConversation => (
+      typeof item === 'object' &&
+      item !== null &&
+      'conversationId' in item &&
+      typeof item.conversationId === 'string' &&
+      'title' in item &&
+      typeof item.title === 'string' &&
+      'updatedAt' in item &&
+      typeof item.updatedAt === 'string'
+    ))
+  } catch (error) {
+    console.error('Failed to read saved chat history.', error)
+    return []
+  }
 }
 
 function ChatPage() {
@@ -112,6 +162,10 @@ function ChatPage() {
 
   // Conversation State
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [savedConversations, setSavedConversations] =
+    useState<SavedConversation[]>(readSavedConversations)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
   // Error State
   const [error, setError] = useState<string | null>(null)
@@ -146,6 +200,31 @@ function ChatPage() {
 
       // Save conversation ID for follow-up messages
       setConversationId(response.conversationId)
+
+      const previousConversation = savedConversations.find(
+        (conversation) => conversation.conversationId === response.conversationId,
+      )
+      const title = previousConversation?.title ?? content.slice(0, 80)
+      const updatedConversations: SavedConversation[] = [
+        {
+          conversationId: response.conversationId,
+          title: title || content.slice(0, 80),
+          updatedAt: new Date().toISOString(),
+        },
+        ...savedConversations.filter(
+          (conversation) => conversation.conversationId !== response.conversationId,
+        ),
+      ]
+      setSavedConversations(updatedConversations)
+
+      try {
+        window.localStorage.setItem(
+          CHAT_HISTORY_STORAGE_KEY,
+          JSON.stringify(updatedConversations),
+        )
+      } catch (storageError) {
+        console.error('Failed to save chat history in this browser.', storageError)
+      }
 
       // Add Assistant Response
       const assistantMessage: ChatMessage = {
@@ -245,7 +324,54 @@ const handleNewConversation = () => {
 
   // Clear failed message
   setLastFailedMessage(null)
+  setIsHistoryOpen(false)
+  setOpenMenuId(null)
 }
+
+  const handleOpenConversation = async (savedConversation: SavedConversation) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const history = await getChatHistory(savedConversation.conversationId)
+      setConversationId(history.conversationId)
+      setMessages(history.messages.map((message) => ({ ...message })))
+      setInput('')
+      setLastFailedMessage(null)
+      setIsHistoryOpen(false)
+      setOpenMenuId(null)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : copy.genericError)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleDeleteConversation = async (savedConversation: SavedConversation) => {
+    setOpenMenuId(null)
+    setError(null)
+
+    try {
+      await deleteChatConversation(savedConversation.conversationId)
+      const updatedConversations = savedConversations.filter(
+        (conversation) => conversation.conversationId !== savedConversation.conversationId,
+      )
+      setSavedConversations(updatedConversations)
+      window.localStorage.setItem(
+        CHAT_HISTORY_STORAGE_KEY,
+        JSON.stringify(updatedConversations),
+      )
+
+      if (conversationId === savedConversation.conversationId) {
+        setMessages([])
+        setConversationId(null)
+        setInput('')
+        setLastFailedMessage(null)
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : copy.genericError)
+    }
+  }
 
   // Handle Suggested Prompts
   const handleSuggestionClick = (prompt: string) => {
@@ -285,6 +411,82 @@ const handleNewConversation = () => {
 
           <div className="flex flex-wrap items-center gap-3">
 
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsHistoryOpen((isOpen) => !isOpen)
+                  setOpenMenuId(null)
+                }}
+                aria-label={copy.history}
+                aria-expanded={isHistoryOpen}
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300"
+              >
+                <History size={15} />
+                {copy.history}
+              </button>
+
+              {isHistoryOpen && (
+                <div className="absolute right-0 top-full z-30 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border-subtle bg-surface-900 shadow-glow">
+                  <p className="border-b border-white/10 px-4 py-3 text-xs font-semibold text-white">
+                    {copy.history}
+                  </p>
+
+                  {savedConversations.length === 0 ? (
+                    <p className="px-4 py-5 text-xs text-slate-400">
+                      {copy.emptyHistory}
+                    </p>
+                  ) : (
+                    <ul className="max-h-80 overflow-y-auto p-2">
+                      {savedConversations.map((savedConversation) => (
+                        <li
+                          key={savedConversation.conversationId}
+                          className="flex items-center gap-1 rounded-lg hover:bg-white/5"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => void handleOpenConversation(savedConversation)}
+                            disabled={isLoading}
+                            className="min-w-0 flex-1 truncate px-3 py-2.5 text-left text-xs text-slate-200 disabled:opacity-50"
+                          >
+                            {savedConversation.title}
+                          </button>
+
+                          <div className="relative shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setOpenMenuId(
+                                (currentId) => currentId === savedConversation.conversationId
+                                  ? null
+                                  : savedConversation.conversationId,
+                              )}
+                              aria-label={`${copy.moreActions}: ${savedConversation.title}`}
+                              aria-expanded={openMenuId === savedConversation.conversationId}
+                              className="grid size-9 place-items-center rounded-md text-slate-400 transition hover:bg-white/10 hover:text-white"
+                            >
+                              <MoreHorizontal size={17} />
+                            </button>
+
+                            {openMenuId === savedConversation.conversationId && (
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteConversation(savedConversation)}
+                                aria-label={`${copy.deleteChat}: ${savedConversation.title}`}
+                                className="absolute right-0 top-full z-40 inline-flex w-44 items-center gap-2 rounded-lg border border-border-subtle bg-surface-900 px-3 py-2.5 text-left text-xs text-red-300 shadow-glow hover:bg-red-400/10"
+                              >
+                                <Trash2 size={14} />
+                                {copy.deleteChat}
+                              </button>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* New Conversation Button */}
 
             <button
@@ -308,7 +510,7 @@ const handleNewConversation = () => {
               <span className="size-2 rounded-full bg-brand-400" />
 
               <span className="text-[10px] font-semibold tracking-wide text-amber-300">
-                {copy.backendPending}
+                {copy.aiProvider}
               </span>
 
             </div>
@@ -316,6 +518,15 @@ const handleNewConversation = () => {
           </div>
 
         </header>
+
+        {error && messages.length === 0 && (
+          <div
+            role="alert"
+            className="mb-4 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-xs leading-6 text-red-300"
+          >
+            {error}
+          </div>
+        )}
 
         {/* Chat Container */}
 
