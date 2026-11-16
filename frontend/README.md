@@ -4,7 +4,7 @@
 
 KUAi is a bilingual team portfolio application that introduces our team, showcases collaborative projects, and provides an interactive AI chat interface.
 
-The frontend is built with React, TypeScript, Vite, and Tailwind CSS. The backend, PostgreSQL persistence, and live AI integration are planned for a later development phase.
+The frontend is built with React, TypeScript, Vite, and Tailwind CSS. It connects through the Express backend to Google Gemini; chat history is temporary and held in backend memory.
 
 **Project:** Team Portfolio AI
 
@@ -30,11 +30,12 @@ The frontend is built with React, TypeScript, Vite, and Tailwind CSS. The backen
 | Automated Frontend Tests | Implemented |
 | ESLint | Configured |
 | Production Build | Verified |
-| Express Backend | Pending Integration |
-| PostgreSQL Persistence | Pending |
-| Live AI Model Integration | Pending |
+| Express Backend | Integrated |
+| Public Chat Rate Limit | 10 requests per minute per host |
+| PostgreSQL Persistence | Not required; history clears when backend stops |
+| Live AI Model Integration | Requires a valid Gemini API key |
 
-> Important: The Chat interface and frontend API client are implemented, but this does not mean that a live AI backend is available. Real AI responses and persistent conversation history require backend and database integration.
+> Chat requests use the Gemini API key stored on the backend. Public requests share a limit of 10 questions per minute; history is not persisted across backend restarts.
 
 ---
 

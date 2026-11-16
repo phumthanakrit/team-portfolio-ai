@@ -12,7 +12,7 @@ import { useLanguage } from '../../contexts/language-context'
 
 import {
   getLocalizedText,
-  portfolioData,
+  usePortfolioData,
 } from '../../data/portfolioData'
 
 import type { Language } from '../../data/portfolioData'
@@ -89,7 +89,7 @@ function getSafeEmail(value?: string): string | undefined {
 }
 
 function TeamContact() {
-  const { group } = portfolioData
+  const { group } = usePortfolioData()
   const { language } = useLanguage()
 
   const isThai = language === 'th'

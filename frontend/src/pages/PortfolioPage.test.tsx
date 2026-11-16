@@ -19,6 +19,8 @@ import {
 import { MemoryRouter } from 'react-router'
 
 import { LanguageProvider } from '../contexts/LanguageProvider'
+import { portfolioData } from '../../../backend/src/portfolioData'
+import { PortfolioDataContext } from '../data/portfolioData'
 import PortfolioPage from './PortfolioPage'
 
 type TestLanguage = 'en' | 'th'
@@ -32,7 +34,9 @@ function renderPortfolioPage(language: TestLanguage) {
   return render(
     <LanguageProvider>
       <MemoryRouter>
-        <PortfolioPage />
+        <PortfolioDataContext.Provider value={portfolioData}>
+          <PortfolioPage />
+        </PortfolioDataContext.Provider>
       </MemoryRouter>
     </LanguageProvider>,
   )

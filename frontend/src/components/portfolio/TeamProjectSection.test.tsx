@@ -12,6 +12,8 @@ import {
 } from '@testing-library/react'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
+import { portfolioData } from '../../../../backend/src/portfolioData'
+import { PortfolioDataContext } from '../../data/portfolioData'
 import TeamProjectSection from './TeamProjectSection'
 import ProjectCover from './ProjectCover'
 
@@ -25,7 +27,9 @@ function renderTeamProjectSection(language: TestLanguage) {
 
   return render(
     <LanguageProvider>
-      <TeamProjectSection />
+      <PortfolioDataContext.Provider value={portfolioData}>
+        <TeamProjectSection />
+      </PortfolioDataContext.Provider>
     </LanguageProvider>,
   )
 }

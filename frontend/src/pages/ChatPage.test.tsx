@@ -126,7 +126,6 @@ afterEach(() => {
 // =========================================
 
 describe('ChatPage Component', () => {
-
   it('should display Thai chat page content', () => {
     renderChatPage('th')
 

@@ -13,7 +13,7 @@ import ProjectCover from './ProjectCover'
 
 import {
   getLocalizedText,
-  portfolioData,
+  usePortfolioData,
 } from '../../data/portfolioData'
 
 import type {
@@ -301,7 +301,7 @@ function TeamProjectSection() {
   const { language } = useLanguage()
   const copy = getProjectCopy(language)
 
-  const projects = portfolioData.teamProjects.filter(
+  const projects = usePortfolioData().teamProjects.filter(
     (project) => !project.isPlaceholder,
   )
 

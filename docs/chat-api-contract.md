@@ -93,6 +93,10 @@ Both fields must contain non-empty strings.
   }
 }
 
+### 429 Too Many Requests — Host Rate Limit
+
+All visitors share a limit of 10 questions per minute per backend process.
+
 ### 500 Internal Server Error
 
 {
@@ -113,9 +117,10 @@ Error responses must not expose API keys, provider credentials, database credent
 5. Validate conversation identifiers before retrieving conversation data.
 6. Load relevant team portfolio context.
 7. Send the user's question and context to the AI service.
-8. Save user messages and AI responses in PostgreSQL.
+8. Store user messages and AI responses in bounded in-memory history.
 9. Return the documented response structure.
 10. Handle errors without exposing secret API keys or internal implementation details.
+11. Limit all users to 10 chat requests per minute per backend process.
 
 ## 7. Frontend Responsibilities
 
@@ -137,11 +142,12 @@ Note: The 30-second timeout is a Frontend request timeout. It does not by itself
 2. Backend validation must remain authoritative.
 3. Unicode message-length rules must be consistent across both sides.
 4. Conversation history must use the returned conversationId.
-5. PostgreSQL persistence and real AI provider integration must be verified independently before production readiness is claimed.
+5. In-memory history is cleared when the backend stops or restarts.
+6. All public users share the host's Gemini quota and request limit.
 
 ## 9. Conversation History
 
-The frontend stores conversation IDs in the current browser. The browser requests a conversation by ID when the user opens it.
+The frontend stores conversation IDs in the current browser session. The backend holds message content in memory; history is unavailable after the backend stops or restarts.
 
 GET /api/chat/conversations/{conversationId}
 
@@ -163,7 +169,7 @@ DELETE /api/chat/conversations/{conversationId}
 
 HTTP 204 No Content
 
-Deleting a conversation also deletes its messages. Conversation IDs are kept in the browser that created them; there is no global conversation-list endpoint.
+Deleting a conversation removes its messages from backend memory. Conversation IDs are kept in the browser that created them; there is no global conversation-list endpoint.
 
 ## 10. Portfolio Data Source
 

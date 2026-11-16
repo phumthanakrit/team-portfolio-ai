@@ -18,6 +18,8 @@ import {
 } from '@testing-library/react'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
+import { portfolioData } from '../../../../backend/src/portfolioData'
+import { PortfolioDataContext } from '../../data/portfolioData'
 import TeamIntroduction from './TeamIntroduction'
 
 const LANGUAGE_STORAGE_KEY = 'team-portfolio-ai-language'
@@ -25,7 +27,9 @@ const LANGUAGE_STORAGE_KEY = 'team-portfolio-ai-language'
 function renderTeamIntroduction() {
   return render(
     <LanguageProvider>
-      <TeamIntroduction />
+      <PortfolioDataContext.Provider value={portfolioData}>
+        <TeamIntroduction />
+      </PortfolioDataContext.Provider>
     </LanguageProvider>,
   )
 }
@@ -50,10 +54,10 @@ describe('TeamIntroduction Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText(
-        'Our team introduction will be added after all members confirm the group profile.',
-      ),
+      screen.getByText('We are KUAi (Know Us. Ask AI.)'),
     ).toBeInTheDocument()
+
+    expect(screen.getByText('Turn data into conversations and make technology accessible.')).toBeInTheDocument()
   })
 
   it('should display Thai content when Thai is selected', () => {
@@ -71,10 +75,11 @@ describe('TeamIntroduction Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText(
-        'ข้อมูลแนะนำทีมจะเพิ่มเติมหลังจากสมาชิกยืนยันข้อมูลของกลุ่มเรียบร้อยแล้ว',
-      ),
+      screen.getByText('เราคือทีม KUAi (Know Us. Ask AI.)'),
     ).toBeInTheDocument()
+
+    expect(screen.getByText('เปลี่ยนข้อมูลให้เป็นบทสนทนา และเปลี่ยนเทคโนโลยีให้เข้าถึงง่าย')).toBeInTheDocument()
+    expect(screen.queryByText('กำลังเตรียมข้อมูล')).not.toBeInTheDocument()
   })
 
   it('should display the confirmed team member count', () => {
@@ -84,19 +89,19 @@ describe('TeamIntroduction Component', () => {
     expect(screen.getByText('TEAM MEMBERS')).toBeInTheDocument()
   })
 
-  it('should not display unverified sample core strengths', () => {
+  it('should display the selected core strengths', () => {
     renderTeamIntroduction()
 
     expect(
-      screen.queryByText(
+      screen.getByText(
         'Cross-functional collaboration with clear API contracts',
       ),
-    ).not.toBeInTheDocument()
+    ).toBeInTheDocument()
 
     expect(
-      screen.getByText(
+      screen.queryByText(
         'Our confirmed team strengths will appear here after the members review their skills and collaboration.',
       ),
-    ).toBeInTheDocument()
+    ).not.toBeInTheDocument()
   })
 })
