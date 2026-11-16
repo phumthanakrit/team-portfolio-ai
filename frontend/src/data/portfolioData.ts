@@ -130,6 +130,9 @@ interface MemberBase {
   readonly id: MemberId;
   readonly fullName: string;
   readonly nickname: string;
+  /** Manually confirmed age, when the member chooses to publish it. */
+  readonly age?: number;
+  readonly isNameVerified?: boolean;
   /** Legacy English field retained for the existing MemberCard. */
   readonly roleName: string;
   /** New bilingual role field for the language-aware UI. */
@@ -305,7 +308,7 @@ export const portfolioData: PortfolioData = {
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
       avatar: undefined,
-      socialLinks: {},
+      socialLinks: { github: '', linkedin: '', portfolio: '' },
       themeColor: {
         primary: '#22d3ee',
         secondary: '#6366f1',
@@ -349,25 +352,40 @@ export const portfolioData: PortfolioData = {
       projects: [
         {
           id: 'member-1-project-1',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
-          technologies: [],
+          title: { en: 'Smart Lab Booking System', th: 'ระบบจองห้องปฏิบัติการอัจฉริยะ' },
+          description: {
+            en: 'Built a web-based real-time booking system for AIE Laboratory. Integrated camera-based object detection to monitor seat occupancy and booking status in real time. Designed the UX/UI for seamless online reservation.',
+            th: 'พัฒนาระบบจองแบบเรียลไทม์บนเว็บสำหรับห้องปฏิบัติการ AIE ผสานการตรวจจับวัตถุจากกล้องเพื่อติดตามการใช้ที่นั่งและสถานะการจองแบบเรียลไทม์ พร้อมออกแบบ UX/UI เพื่อให้จองออนไลน์ได้อย่างราบรื่น',
+          },
+          technologies: ['UX/UI Design', 'Computer Vision'],
           coverImage: undefined,
           isPlaceholder: false,
         },
         {
           id: 'member-1-project-2',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
-          technologies: [],
+          title: {
+            en: 'Wireless Camera Vision & Streaming System',
+            th: 'ระบบกล้องไร้สายสำหรับ Computer Vision และสตรีมมิง',
+          },
+          description: {
+            en: 'Engineered a low-latency wireless camera system to stream high-throughput video feeds across a local network, establishing resilient data pipelines for real-time remote monitoring. Optimized video compression and network streaming protocols to maintain stable frame rates, minimize packet loss, and prevent transmission delays under fluctuating bandwidth conditions. Overcame wireless latency constraints by configuring custom frame buffering and integrating multi-threaded frame processing to deliver seamless visual telemetry to external client interfaces.',
+            th: 'พัฒนาระบบกล้องไร้สายที่มีความหน่วงต่ำสำหรับสตรีมวิดีโอปริมาณสูงผ่านเครือข่ายภายใน พร้อมวางระบบส่งต่อข้อมูลที่ทนทานเพื่อรองรับการตรวจสอบระยะไกลแบบเรียลไทม์ ปรับแต่งการบีบอัดวิดีโอและโปรโตคอลสตรีมมิงเครือข่ายเพื่อรักษาอัตราเฟรมให้สม่ำเสมอ ลดการสูญหายของแพ็กเก็ต และป้องกันความล่าช้าในการส่งข้อมูลเมื่อแบนด์วิดท์ผันผวน แก้ข้อจำกัดด้านความหน่วงของเครือข่ายไร้สายด้วยการกำหนดค่าบัฟเฟอร์เฟรมแบบเฉพาะและการประมวลผลเฟรมแบบมัลติเธรด เพื่อส่งข้อมูลภาพไปยังอินเทอร์เฟซของไคลเอนต์ภายนอกได้อย่างต่อเนื่อง',
+          },
+          technologies: ['Python', 'OpenCV', 'RTSP / WebSockets', 'Linux'],
           coverImage: undefined,
           isPlaceholder: false,
         },
         {
           id: 'member-1-project-3',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
-          technologies: [],
+          title: {
+            en: 'Survey-Driven Predictive AI System',
+            th: 'ระบบ AI คาดการณ์ผลจากแบบสำรวจ',
+          },
+          description: {
+            en: 'Architected an end-to-end machine learning pipeline that transforms custom web survey data into structured datasets to predict real-world user outcomes. Engineered feature extraction scripts to preprocess, clean, and encode raw survey variables (categorical and numerical), building a reliable ground-truth training dataset. Trained and tuned supervised learning models (XGBoost / Random Forest) to identify complex response patterns, delivering real-time outcome predictions via a REST API endpoint.',
+            th: 'ออกแบบกระบวนการ Machine Learning แบบครบวงจรที่แปลงข้อมูลจากแบบสำรวจบนเว็บที่สร้างขึ้นเองให้เป็นชุดข้อมูลที่มีโครงสร้าง เพื่อใช้คาดการณ์ผลลัพธ์ของผู้ใช้ในสถานการณ์จริง พัฒนาสคริปต์สกัดคุณลักษณะเพื่อเตรียม ทำความสะอาด และเข้ารหัสตัวแปรจากแบบสำรวจทั้งแบบหมวดหมู่และตัวเลข จนได้ชุดข้อมูลฝึกสอนที่มีข้อมูลจริงอ้างอิงที่เชื่อถือได้ ฝึกและปรับแต่งโมเดล Supervised Learning (XGBoost / Random Forest) เพื่อค้นหารูปแบบคำตอบที่ซับซ้อน และให้บริการการคาดการณ์ผลแบบเรียลไทม์ผ่าน REST API endpoint',
+          },
+          technologies: ['Python', 'Scikit-Learn', 'XGBoost', 'Flask / REST API'],
           coverImage: undefined,
           isPlaceholder: false,
         },
@@ -377,8 +395,9 @@ export const portfolioData: PortfolioData = {
     {
       id: 'member-2',
       roleKey: 'backend',
-      fullName: 'Blair Serverton',
-      nickname: 'Blair',
+      fullName: 'Thanakrit Archawabool',
+      nickname: 'Phum',
+      isNameVerified: true,
       roleName: 'Backend Developer & Database Engineer',
       roleNameI18n: {
         en: 'Backend Developer & Database Engineer',
@@ -392,8 +411,12 @@ export const portfolioData: PortfolioData = {
         en: 'Placeholder: Add the member biography and interests.',
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
-      avatar: undefined,
-      socialLinks: {},
+      avatar: '/images/projects/member-2/member-2.jpeg',
+      socialLinks: {
+        github: '',
+        linkedin: 'https://www.linkedin.com/in/thanakrit-archawabool-80aa563b0/',
+        portfolio: '',
+      },
       themeColor: {
         primary: '#a78bfa',
         secondary: '#ec4899',
@@ -442,24 +465,54 @@ export const portfolioData: PortfolioData = {
       projects: [
         {
           id: 'member-2-project-1',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
-          technologies: [],
-          coverImage: undefined,
+          title: {
+            en: 'Bangkok University School of Engineering Website',
+            th: 'เว็บไซต์คณะวิศวกรรมศาสตร์ มหาวิทยาลัยกรุงเทพ',
+          },
+          description: {
+            en: 'A multilingual website presenting ambassadors, committee members, news, and contact information for the School of Engineering, Bangkok University.',
+            th: 'เว็บไซต์หลายภาษาที่นำเสนอข้อมูลแอมบาสเดอร์ คณะกรรมการ ข่าวสาร และช่องทางติดต่อของคณะวิศวกรรมศาสตร์ มหาวิทยาลัยกรุงเทพ',
+          },
+          technologies: [
+            'JavaScript',
+            'JSX',
+            'HTML',
+            'CSS',
+            'Next.js',
+            'React',
+            'Node.js',
+            'Cheerio',
+            'Docker',
+            'Nginx',
+            'GitHub Actions',
+          ],
+          coverImage: '/images/projects/member-2/member-2-project-1.png',
           isPlaceholder: false,
         },
         {
           id: 'member-2-project-2',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
-          technologies: [],
+          title: {
+            en: 'ROS 2 Web Control Interface | 2026',
+            th: 'เว็บอินเทอร์เฟซควบคุมระบบ ROS 2 | 2026',
+          },
+          description: {
+            en: '• Developed a web-based interface for controlling a ROS 2 system.',
+            th: '• พัฒนาเว็บอินเทอร์เฟซสำหรับควบคุมระบบ ROS 2',
+          },
+          technologies: ['ROS 2', 'HTML', 'CSS', 'JavaScript'],
           coverImage: undefined,
           isPlaceholder: false,
         },
         {
           id: 'member-2-project-3',
-          title: { en: '', th: '' },
-          description: { en: '', th: '' },
+          title: {
+            en: 'Calorie-Tracking Application Prototype | 2025',
+            th: 'ต้นแบบแอปพลิเคชันติดตามแคลอรี | 2025',
+          },
+          description: {
+            en: '• Created a prototype application for tracking calorie intake.',
+            th: '• สร้างต้นแบบแอปพลิเคชันสำหรับติดตามปริมาณแคลอรีที่รับประทาน',
+          },
           technologies: [],
           coverImage: undefined,
           isPlaceholder: false,
@@ -486,7 +539,7 @@ export const portfolioData: PortfolioData = {
         th: 'ข้อความตัวอย่าง: เพิ่มประวัติและความสนใจของสมาชิก',
       },
       avatar: undefined,
-      socialLinks: {},
+      socialLinks: { github: '', linkedin: '', portfolio: '' },
       themeColor: {
         primary: '#34d399',
         secondary: '#f59e0b',
@@ -630,7 +683,7 @@ export const buildPortfolioContext = (
   const lines: string[] = [
     'TEAM PORTFOLIO KNOWLEDGE',
     'The visitor may speak Thai or English. Detect the language of the latest user message and respond in that same language.',
-    'Do not invent member identities, skills, experience, links, or project claims.',
+    'Do not invent member identities, ages, skills, experience, links, or project claims.',
     `Team size: exactly ${data.members.length} members.`,
   ];
 
@@ -680,35 +733,45 @@ export const buildPortfolioContext = (
 
   lines.push('', 'TEAM MEMBERS:');
   for (const member of data.members) {
-    if (member.isPlaceholder) {
-      lines.push(
-        `- ${member.id}: PROFILE NOT VERIFIED. The displayed name, role, biography, skills, responsibilities, social links, and personal projects are sample placeholders. Do not repeat them as facts.`,
-      );
-      continue;
+    const hasVerifiedName =
+      !member.isPlaceholder || member.isNameVerified === true;
+    const memberLabel = hasVerifiedName
+      ? `${member.fullName} (${member.nickname})`
+      : `${member.id} (name not verified)`;
+
+    lines.push(`- ${memberLabel}`);
+
+    if (member.age !== undefined) {
+      lines.push(`  Age: ${member.age}`);
     }
 
-    lines.push(`- ${member.fullName} (${member.nickname})`);
-    lines.push(`  Role (EN): ${member.roleNameI18n.en || member.roleName}`);
-    lines.push(`  Role (TH): ${member.roleNameI18n.th || member.roleName}`);
-    lines.push(`  Introduction (EN): ${member.introduction.en || 'Not provided'}`);
-    lines.push(`  Introduction (TH): ${member.introduction.th || 'ยังไม่มีข้อมูล'}`);
-    lines.push(`  Biography (EN): ${member.biography.en || 'Not provided'}`);
-    lines.push(`  Biography (TH): ${member.biography.th || 'ยังไม่มีข้อมูล'}`);
+    if (member.isPlaceholder) {
+      lines.push(
+        '  Role, biography, skills, responsibilities, and social links are not verified. Do not present them as facts.',
+      );
+    } else {
+      lines.push(`  Role (EN): ${member.roleNameI18n.en || member.roleName}`);
+      lines.push(`  Role (TH): ${member.roleNameI18n.th || member.roleName}`);
+      lines.push(`  Introduction (EN): ${member.introduction.en || 'Not provided'}`);
+      lines.push(`  Introduction (TH): ${member.introduction.th || 'ยังไม่มีข้อมูล'}`);
+      lines.push(`  Biography (EN): ${member.biography.en || 'Not provided'}`);
+      lines.push(`  Biography (TH): ${member.biography.th || 'ยังไม่มีข้อมูล'}`);
 
-    const skills = [
-      ...member.skills.core,
-      ...(member.roleKey === 'frontend'
-        ? [...member.skills.designAndAnimation, ...member.skills.tools]
-        : member.roleKey === 'backend'
-          ? member.skills.toolsAndAI
-          : [...member.skills.testing, ...member.skills.webServer]),
-    ];
-    lines.push(`  Skills: ${skills.join(', ')}`);
-    lines.push(
-      `  Responsibilities: ${member.responsibilities
-        .map((item) => `${item.en} / ${item.th}`)
-        .join('; ')}`,
-    );
+      const skills = [
+        ...member.skills.core,
+        ...(member.roleKey === 'frontend'
+          ? [...member.skills.designAndAnimation, ...member.skills.tools]
+          : member.roleKey === 'backend'
+            ? member.skills.toolsAndAI
+            : [...member.skills.testing, ...member.skills.webServer]),
+      ];
+      lines.push(`  Skills: ${skills.join(', ')}`);
+      lines.push(
+        `  Responsibilities: ${member.responsibilities
+          .map((item) => `${item.en} / ${item.th}`)
+          .join('; ')}`,
+      );
+    }
 
     const verifiedPersonalProjects = member.projects.filter(
       (project) =>
@@ -716,7 +779,7 @@ export const buildPortfolioContext = (
         Boolean(project.title.en.trim() || project.title.th.trim()),
     );
     if (verifiedPersonalProjects.length === 0) {
-      lines.push('  Verified individual projects: None provided yet.');
+      lines.push(`  Verified individual projects for ${memberLabel}: None provided yet.`);
     } else {
       for (const project of verifiedPersonalProjects) {
         lines.push(`  Individual project: ${project.title.en} / ${project.title.th}`);

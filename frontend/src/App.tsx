@@ -5,7 +5,7 @@ import {
   Routes,
 } from 'react-router'
 
-import PortfolioPage from './pages/PortfolioPage'
+import PortfolioPage, { MemberProfilePage } from './pages/PortfolioPage'
 import ChatPage from './pages/ChatPage'
 
 function App() {
@@ -16,6 +16,11 @@ function App() {
       <Route
         path="/"
         element={<PortfolioPage />}
+      />
+
+      <Route
+        path="/members/:memberId"
+        element={<MemberProfilePage />}
       />
 
       {/* AI Chat Page */}

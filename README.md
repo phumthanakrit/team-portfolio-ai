@@ -5,7 +5,7 @@
 
 A bilingual team portfolio and AI chat application that introduces our team, showcases collaborative projects, and provides an interactive chat interface.
 
-A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, PostgreSQL persistence, and Google Gemini integration in the backend.
+A web application that presents our team portfolio and provides an AI-powered chat interface. The project uses React and TypeScript for the frontend, with an Express API, in-memory conversation history, and Google Gemini integration in the backend.
 
 ## Project Status
 
@@ -26,8 +26,8 @@ A web application that presents our team portfolio and provides an AI-powered ch
 | GitHub Actions Frontend CI | Passing |
 | Production Website | Deployed |
 | Express Backend | Implemented |
-| PostgreSQL Integration | Implemented (tables created on startup) |
-| Google Gemini Integration | Implemented (requires an API key) |
+| Conversation History | In memory; cleared when the backend stops |
+| Google Gemini Integration | Implemented (requires a backend API key) |
 
 ## Project Branding
 
@@ -37,7 +37,7 @@ A web application that presents our team portfolio and provides an AI-powered ch
 - Production Website: https://vercel.app
 
 
-> Chat requests require a configured backend, a running PostgreSQL database, and a Google Gemini API key.
+> Chat requests require the backend and a Google Gemini API key. PostgreSQL is not required; public requests share a host-wide limit of 10 questions per minute.
 
 ## Technology Stack
 
@@ -52,11 +52,11 @@ A web application that presents our team portfolio and provides an AI-powered ch
 - Vitest
 - React Testing Library
 
-### Backend and Database
+### Backend and AI
 
 - Node.js
 - Express
-- PostgreSQL
+- Google Gemini
 
 ## Repository Structure
 
@@ -113,21 +113,9 @@ npm install
 
 ### 3. Configure Environment Variables
 
-Create the backend environment file from the example.
+Create `backend/.env` locally and set `GOOGLE_API_KEY` to a newly rotated Gemini key. PostgreSQL is not required; conversations are held in memory and disappear when the backend stops.
 
-PowerShell:
-
-```powershell
-Copy-Item backend/.env.example backend/.env
-```
-
-macOS / Linux:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-Set `DATABASE_URL` and `GOOGLE_API_KEY` in `backend/.env`. Create the PostgreSQL database named in `DATABASE_URL` before starting the backend; it creates its tables automatically.
+The Google Gemini API key stays in the backend environment and is never sent to browsers. Public visitors can ask questions; all visitors share a limit of 10 questions per minute on the host.
 
 For local development, the frontend uses the Vite proxy to connect to `http://localhost:3000` by default. No frontend environment file is required unless you need to override that configuration.
 
@@ -143,7 +131,15 @@ Run this command from the repository root. It starts the Express backend on port
 
 The backend requires PostgreSQL and the environment variables above. The frontend Vite proxy forwards `/api` requests to the backend.
 
-Chat history is stored in PostgreSQL and indexed in the current browser, so restarting the app keeps conversations available in that browser. Each page load starts a fresh chat. Use the history button to reopen a conversation; its three-dot menu deletes that conversation and its messages from the database.
+Chat history is held in memory by the host and in the current browser session. It is cleared when the backend or browser session ends.
+
+### Share the Host with Other Networks (Temporary)
+
+1. Start the frontend and backend from the repository root with `npm run dev`.
+2. In a separate terminal, run `cloudflared tunnel --url http://localhost:5173` using the Cloudflare Tunnel CLI.
+3. Share the temporary `trycloudflare.com` URL.
+
+Keep both the app and tunnel running on the host. The temporary URL changes when the tunnel restarts. This is for temporary sharing, not production hosting; rotate the Gemini key before exposing the app because a key that has appeared in a repository or chat should be treated as compromised.
 
 ## Portfolio Project Slots
 

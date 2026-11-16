@@ -1,12 +1,61 @@
 
+import { ArrowLeft } from 'lucide-react'
+import {
+  Link,
+  Navigate,
+  useParams,
+} from 'react-router'
+
 import Navbar from '../components/layout/Navbar'
 
+import MemberCard from '../components/portfolio/MemberCard'
 import TeamHero from '../components/portfolio/TeamHero'
 import TeamIntroduction from '../components/portfolio/TeamIntroduction'
 import MemberSection from '../components/portfolio/MemberSection'
 import TeamContact from '../components/portfolio/TeamContact'
 import TeamProjectSection from '../components/portfolio/TeamProjectSection'
 import { useLanguage } from '../contexts/language-context'
+import { portfolioData } from '../data/portfolioData'
+
+export function MemberProfilePage() {
+  const { memberId } = useParams()
+  const { language } = useLanguage()
+  const member = portfolioData.members.find(
+    (currentMember) => currentMember.id === memberId,
+  )
+
+  if (!member) {
+    return <Navigate to="/" replace />
+  }
+
+  const memberIndex = portfolioData.members.indexOf(member)
+
+  return (
+    <div className="min-h-screen bg-ink-950 text-white">
+      <Navbar />
+
+      <main className="px-5 py-10 sm:py-14 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-slate-300 transition hover:text-brand-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            {language === 'th' ? 'กลับหน้าหลัก' : 'Back to portfolio'}
+          </Link>
+
+          <div className="mx-auto mt-8 max-w-3xl">
+            <MemberCard
+              member={member}
+              index={memberIndex}
+              isProfilePage
+            />
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
 
 function PortfolioPage() {
   const { language } = useLanguage()

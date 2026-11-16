@@ -17,6 +17,7 @@ import {
   screen,
   within,
 } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
 
@@ -101,6 +102,7 @@ const verifiedMember: Member = {
 function renderMemberCard(
   member: Member,
   language: 'en' | 'th' = 'en',
+  isProfilePage = true,
 ) {
   window.localStorage.setItem(
     LANGUAGE_STORAGE_KEY,
@@ -108,9 +110,15 @@ function renderMemberCard(
   )
 
   return render(
-    <LanguageProvider>
-      <MemberCard member={member} index={0} />
-    </LanguageProvider>,
+    <MemoryRouter>
+      <LanguageProvider>
+        <MemberCard
+          member={member}
+          index={0}
+          isProfilePage={isProfilePage}
+        />
+      </LanguageProvider>
+    </MemoryRouter>,
   )
 }
 
@@ -135,9 +143,7 @@ describe('MemberCard Component', () => {
       }),
     ).toBeInTheDocument()
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Member profile information will appear after the team confirms the details.',
-    )
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
     expect(
       screen.queryByText('Alex Frontier'),
@@ -148,8 +154,66 @@ describe('MemberCard Component', () => {
     ).not.toBeInTheDocument()
 
     expect(
+      screen.getByRole('heading', {
+        name: 'Smart Lab Booking System',
+      }),
+    ).toBeInTheDocument()
+
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+
+    expect(
       screen.queryByRole('link', { name: /GitHub/ }),
     ).not.toBeInTheDocument()
+  })
+
+  it('should display a verified name while hiding other placeholder details', () => {
+    const memberWithVerifiedName = portfolioData.members[1]
+
+    renderMemberCard(memberWithVerifiedName)
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Thanakrit Archawabool',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('@Phum')).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Backend Developer & Database Engineer'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Task Management API Service'),
+    ).not.toBeInTheDocument()
+  })
+
+  it('should show a portfolio link for a placeholder profile when provided', () => {
+    const memberWithPortfolioLink: Member = {
+      ...portfolioData.members[1],
+      socialLinks: {
+        portfolio: 'https://example.com/thanakrit',
+      },
+    }
+
+    renderMemberCard(memberWithPortfolioLink)
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Portfolio / Profile: Thanakrit Archawabool',
+      }),
+    ).toHaveAttribute('href', 'https://example.com/thanakrit')
+  })
+
+  it('should display the verified LinkedIn link for a placeholder profile', () => {
+    renderMemberCard(portfolioData.members[1])
+
+    expect(
+      screen.getByRole('link', {
+        name: 'LinkedIn profile for Thanakrit Archawabool',
+      }),
+    ).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/thanakrit-archawabool-80aa563b0/',
+    )
   })
 
   it('should display verified member information in English', () => {
@@ -166,10 +230,8 @@ describe('MemberCard Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText(
-        'I build accessible web applications.',
-      ),
-    ).toBeInTheDocument()
+      screen.queryByText('I build accessible web applications.'),
+    ).not.toBeInTheDocument()
 
     expect(
       screen.getByText('Current Responsibilities'),
@@ -184,10 +246,8 @@ describe('MemberCard Component', () => {
     ).toBeInTheDocument()
 
     expect(
-      screen.getByText(
-        'ฉันพัฒนาเว็บแอปพลิเคชันที่ทุกคนเข้าถึงได้',
-      ),
-    ).toBeInTheDocument()
+      screen.queryByText('ฉันพัฒนาเว็บแอปพลิเคชันที่ทุกคนเข้าถึงได้'),
+    ).not.toBeInTheDocument()
 
     expect(
       screen.getByText(
@@ -286,5 +346,17 @@ describe('MemberCard Component', () => {
     expect(
       screen.queryByText('Individual Projects'),
     ).not.toBeInTheDocument()
+  })
+
+  it('should link from the member card to its profile page', () => {
+    const member = portfolioData.members[1]
+
+    renderMemberCard(member, 'en', false)
+
+    expect(
+      screen.getByRole('link', {
+        name: 'View profile: Thanakrit Archawabool',
+      }),
+    ).toHaveAttribute('href', '/members/member-2')
   })
 })

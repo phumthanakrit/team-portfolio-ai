@@ -115,36 +115,10 @@ const chatPageCopy: Record<Language, ChatPageCopy> = {
   },
 }
 
-const CHAT_HISTORY_STORAGE_KEY = 'team-portfolio-ai-chat-history-v1'
-
 interface SavedConversation {
   readonly conversationId: string
   readonly title: string
   readonly updatedAt: string
-}
-
-function readSavedConversations(): SavedConversation[] {
-  const saved = window.localStorage.getItem(CHAT_HISTORY_STORAGE_KEY)
-  if (!saved) return []
-
-  try {
-    const parsed: unknown = JSON.parse(saved)
-    if (!Array.isArray(parsed)) return []
-
-    return parsed.filter((item): item is SavedConversation => (
-      typeof item === 'object' &&
-      item !== null &&
-      'conversationId' in item &&
-      typeof item.conversationId === 'string' &&
-      'title' in item &&
-      typeof item.title === 'string' &&
-      'updatedAt' in item &&
-      typeof item.updatedAt === 'string'
-    ))
-  } catch (error) {
-    console.error('Failed to read saved chat history.', error)
-    return []
-  }
 }
 
 function ChatPage() {
@@ -163,7 +137,7 @@ function ChatPage() {
   // Conversation State
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [savedConversations, setSavedConversations] =
-    useState<SavedConversation[]>(readSavedConversations)
+    useState<SavedConversation[]>([])
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
@@ -216,15 +190,6 @@ function ChatPage() {
         ),
       ]
       setSavedConversations(updatedConversations)
-
-      try {
-        window.localStorage.setItem(
-          CHAT_HISTORY_STORAGE_KEY,
-          JSON.stringify(updatedConversations),
-        )
-      } catch (storageError) {
-        console.error('Failed to save chat history in this browser.', storageError)
-      }
 
       // Add Assistant Response
       const assistantMessage: ChatMessage = {
@@ -357,10 +322,6 @@ const handleNewConversation = () => {
         (conversation) => conversation.conversationId !== savedConversation.conversationId,
       )
       setSavedConversations(updatedConversations)
-      window.localStorage.setItem(
-        CHAT_HISTORY_STORAGE_KEY,
-        JSON.stringify(updatedConversations),
-      )
 
       if (conversationId === savedConversation.conversationId) {
         setMessages([])

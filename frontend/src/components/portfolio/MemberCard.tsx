@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
+import { Link } from 'react-router'
 
 import { useLanguage } from '../../contexts/language-context'
 
@@ -29,6 +30,7 @@ import type {
 interface MemberCardProps {
   member: Member
   index: number
+  isProfilePage?: boolean
 }
 
 interface SkillGroup {
@@ -309,47 +311,52 @@ function ProjectCard({
   )
 }
 
-function MemberCard({ member, index }: MemberCardProps) {
+function MemberCard({
+  member,
+  index,
+  isProfilePage = false,
+}: MemberCardProps) {
   const { language } = useLanguage()
   const isThai = language === 'th'
 
   const copy = isThai
     ? {
         member: 'สมาชิก',
+        viewProfile: 'ดูโปรไฟล์',
         profilePending: 'รอข้อมูลสมาชิก',
-        profileDescription:
-          'ข้อมูลโปรไฟล์จะแสดงหลังจากสมาชิกยืนยันข้อมูลเรียบร้อยแล้ว',
         rolePending: 'กำลังรอยืนยันบทบาท',
-        introduction: 'แนะนำตัว',
         biography: 'เกี่ยวกับสมาชิก',
         skills: 'ทักษะทางเทคนิค',
         responsibilities: 'หน้าที่รับผิดชอบ',
         projects: 'ผลงานส่วนตัว',
+        portfolioLink: 'ลิงก์ผลงาน/โปรไฟล์',
         noImage: 'ไม่มีภาพตัวอย่าง',
         sourceCode: 'ดู Source Code',
         webDemo: 'ทดลองใช้งาน',
       }
     : {
         member: 'Member',
+        viewProfile: 'View profile',
         profilePending: 'PROFILE PENDING',
-        profileDescription:
-          'Member profile information will appear after the team confirms the details.',
         rolePending: 'Role pending confirmation',
-        introduction: 'Introduction',
         biography: 'About',
         skills: 'Technical Skills',
         responsibilities: 'Current Responsibilities',
         projects: 'Individual Projects',
+        portfolioLink: 'Portfolio / Profile',
         noImage: 'No preview image',
         sourceCode: 'Source Code',
         webDemo: 'Live Demo',
       }
 
-  const displayName = member.isPlaceholder
-    ? `${copy.member} ${String(index + 1).padStart(2, '0')}`
-    : member.fullName.trim() || `${copy.member} ${index + 1}`
+  const hasVerifiedName =
+    !member.isPlaceholder || member.isNameVerified === true
 
-  const initials = member.isPlaceholder
+  const displayName = hasVerifiedName
+    ? member.fullName.trim() || `${copy.member} ${index + 1}`
+    : `${copy.member} ${String(index + 1).padStart(2, '0')}`
+
+  const initials = !hasVerifiedName
     ? ''
     : getInitials(member.fullName)
 
@@ -357,10 +364,6 @@ function MemberCard({ member, index }: MemberCardProps) {
     ? ''
     : getLocalizedText(member.roleNameI18n, language) ||
       member.roleName
-
-  const introduction = member.isPlaceholder
-    ? ''
-    : getLocalizedText(member.introduction, language)
 
   const biography = member.isPlaceholder
     ? ''
@@ -376,28 +379,65 @@ function MemberCard({ member, index }: MemberCardProps) {
         .map((item) => getLocalizedText(item, language))
         .filter(Boolean)
 
-  const projects = member.isPlaceholder
-    ? []
-    : member.projects.filter((project) => {
-        return (
-          !project.isPlaceholder &&
-          Boolean(
-            project.title.en.trim() || project.title.th.trim(),
-          )
-        )
-      })
+  const projects = member.projects.filter((project) => {
+    return (
+      !project.isPlaceholder &&
+      Boolean(project.title.en.trim() || project.title.th.trim())
+    )
+  })
 
-  const githubUrl = member.isPlaceholder
-    ? undefined
-    : getSafeExternalUrl(member.socialLinks.github)
+  const githubUrl = getSafeExternalUrl(member.socialLinks.github)
 
-  const linkedinUrl = member.isPlaceholder
-    ? undefined
-    : getSafeExternalUrl(member.socialLinks.linkedin)
+  const linkedinUrl = getSafeExternalUrl(member.socialLinks.linkedin)
 
-  const portfolioUrl = member.isPlaceholder
-    ? undefined
-    : getSafeExternalUrl(member.socialLinks.portfolio)
+  const portfolioUrl = getSafeExternalUrl(member.socialLinks.portfolio)
+
+  const memberHeader = (
+    <div className="flex items-start gap-4">
+      <MemberAvatar
+        src={member.avatar}
+        fullName={displayName}
+        initials={initials}
+        isPlaceholder={!hasVerifiedName}
+        primaryColor={member.themeColor.primary}
+        secondaryColor={member.themeColor.secondary}
+        glow={member.themeColor.glow}
+      />
+
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+            MEMBER {String(index + 1).padStart(2, '0')}
+          </span>
+
+          <span
+            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
+              member.isPlaceholder
+                ? 'bg-amber-400/10 text-amber-300'
+                : 'bg-white/5 text-brand-300'
+            }`}
+          >
+            {member.isPlaceholder
+              ? copy.profilePending
+              : member.roleKey}
+          </span>
+        </div>
+
+        <h3
+          id={`member-${member.id}-name`}
+          className="wrap-break-word font-display text-xl font-semibold text-white"
+        >
+          {displayName}
+        </h3>
+
+        {hasVerifiedName && member.nickname.trim() && (
+          <p className="mt-1 text-xs text-slate-400">
+            @{member.nickname}
+          </p>
+        )}
+      </div>
+    </div>
+  )
 
   return (
     <article
@@ -413,85 +453,26 @@ function MemberCard({ member, index }: MemberCardProps) {
         }}
       />
 
-      {/* Member Header */}
-      <div className="flex items-start gap-4">
-        <MemberAvatar
-          src={member.avatar}
-          fullName={displayName}
-          initials={initials}
-          isPlaceholder={member.isPlaceholder}
-          primaryColor={member.themeColor.primary}
-          secondaryColor={member.themeColor.secondary}
-          glow={member.themeColor.glow}
-        />
-
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-              MEMBER {String(index + 1).padStart(2, '0')}
-            </span>
-
-            <span
-              className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-                member.isPlaceholder
-                  ? 'bg-amber-400/10 text-amber-300'
-                  : 'bg-white/5 text-brand-300'
-              }`}
-            >
-              {member.isPlaceholder
-                ? copy.profilePending
-                : member.roleKey}
-            </span>
-          </div>
-
-          <h3
-            id={`member-${member.id}-name`}
-            className="wrap-break-word font-display text-xl font-semibold text-white"
-          >
-            {displayName}
-          </h3>
-
-          {!member.isPlaceholder && member.nickname.trim() && (
-            <p className="mt-1 text-xs text-slate-400">
-              @{member.nickname}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Placeholder notice */}
-      {member.isPlaceholder && (
-        <div
-          role="status"
-          className="mt-6 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"
+      {isProfilePage ? (
+        memberHeader
+      ) : (
+        <Link
+          to={`/members/${member.id}`}
+          aria-label={`${copy.viewProfile}: ${displayName}`}
+          className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
         >
-          <p className="text-xs leading-6 text-slate-300">
-            {copy.profileDescription}
-          </p>
-        </div>
+          {memberHeader}
+          <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3 text-xs font-medium text-slate-400 transition-colors hover:text-brand-300">
+            <span>{copy.viewProfile}</span>
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </div>
+        </Link>
       )}
 
-      {/* Verified profile content */}
-      {!member.isPlaceholder && (
-        <>
-          {/* Role */}
-          {roleName && (
-            <div className="mt-6 flex items-start gap-2">
-              <Sparkles
-                size={16}
-                className="mt-0.5 shrink-0"
-                style={{ color: member.themeColor.primary }}
-              />
-
-              <p className="text-sm font-medium leading-6 text-slate-200">
-                {roleName}
-              </p>
-            </div>
-          )}
-
-          {/* Social Links */}
+      {isProfilePage && (
+        <div className="pt-6">
           {(githubUrl || linkedinUrl || portfolioUrl) && (
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="mb-6 flex flex-wrap gap-2">
               {githubUrl && (
                 <a
                   href={githubUrl}
@@ -525,107 +506,117 @@ function MemberCard({ member, index }: MemberCardProps) {
                   href={portfolioUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Personal portfolio for ${displayName}`}
+                  aria-label={`${copy.portfolioLink}: ${displayName}`}
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-medium text-slate-300 transition hover:border-brand-400/30 hover:bg-brand-500/10 hover:text-brand-300"
                 >
                   <ExternalLink size={14} />
-                  Portfolio
+                  {copy.portfolioLink}
                   <ArrowUpRight size={12} />
                 </a>
               )}
             </div>
           )}
 
-          {/* Introduction */}
-          {introduction && (
-            <div className="mt-6">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                {copy.introduction}
-              </h4>
+          {/* Verified profile content */}
+          {!member.isPlaceholder && (
+            <>
+              {/* Role */}
+              {roleName && (
+                <div className="mt-6 flex items-start gap-2">
+                  <Sparkles
+                    size={16}
+                    className="mt-0.5 shrink-0"
+                    style={{ color: member.themeColor.primary }}
+                  />
 
-              <p className="mt-3 text-sm leading-7 text-slate-400">
-                {introduction}
-              </p>
-            </div>
-          )}
+                  <p className="text-sm font-medium leading-6 text-slate-200">
+                    {roleName}
+                  </p>
+                </div>
+              )}
 
-          {/* Biography */}
-          {biography && (
-            <div className="mt-5">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                {copy.biography}
-              </h4>
+              {/* Biography */}
+              {biography && (
+                <div className="mt-5">
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                    {copy.biography}
+                  </h4>
 
-              <p className="mt-3 text-sm leading-7 text-slate-400">
-                {biography}
-              </p>
-            </div>
-          )}
+                  <p className="mt-3 text-sm leading-7 text-slate-400">
+                    {biography}
+                  </p>
+                </div>
+              )}
 
-          {/* Skills */}
-          {skillGroups.length > 0 && (
-            <div className="mt-7 border-t border-border-subtle pt-6">
-              <div className="mb-4 flex items-center gap-2">
-                <Code2 size={16} className="text-brand-300" />
+              {/* Skills */}
+              {skillGroups.length > 0 && (
+                <div className="mt-7 border-t border-border-subtle pt-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Code2 size={16} className="text-brand-300" />
 
-                <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                  {copy.skills}
-                </h4>
-              </div>
-
-              <div className="space-y-4">
-                {skillGroups.map((group) => (
-                  <div key={group.title}>
-                    <p className="mb-2 text-[11px] font-medium text-slate-500">
-                      {group.title}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {group.items.map((skill) => (
-                        <span
-                          key={`${group.title}-${skill}`}
-                          className="rounded-lg border border-white/10 bg-white/4 px-2.5 py-1.5 text-[11px] text-slate-300"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
+                    <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                      {copy.skills}
+                    </h4>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  <div className="space-y-4">
+                    {skillGroups.map((group) => (
+                      <div key={group.title}>
+                        <p className="mb-2 text-[11px] font-medium text-slate-500">
+                          {group.title}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                          {group.items.map((skill) => (
+                            <span
+                              key={`${group.title}-${skill}`}
+                              className="rounded-lg border border-white/10 bg-white/4 px-2.5 py-1.5 text-[11px] text-slate-300"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Responsibilities */}
+              {responsibilities.length > 0 && (
+                <div className="mt-7 border-t border-border-subtle pt-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+                    {copy.responsibilities}
+                  </h4>
+
+                  <ul className="mt-4 space-y-3">
+                    {responsibilities.map((responsibility, responsibilityIndex) => (
+                      <li
+                        key={`${member.id}-responsibility-${responsibilityIndex}`}
+                        className="flex items-start gap-2.5"
+                      >
+                        <Check
+                          size={15}
+                          className="mt-0.5 shrink-0 text-emerald-400"
+                        />
+
+                        <span className="text-xs leading-6 text-slate-400">
+                          {responsibility}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+            </>
           )}
 
-          {/* Responsibilities */}
-          {responsibilities.length > 0 && (
-            <div className="mt-7 border-t border-border-subtle pt-6">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
-                {copy.responsibilities}
-              </h4>
-
-              <ul className="mt-4 space-y-3">
-                {responsibilities.map((responsibility, responsibilityIndex) => (
-                  <li
-                    key={`${member.id}-responsibility-${responsibilityIndex}`}
-                    className="flex items-start gap-2.5"
-                  >
-                    <Check
-                      size={15}
-                      className="mt-0.5 shrink-0 text-emerald-400"
-                    />
-
-                    <span className="text-xs leading-6 text-slate-400">
-                      {responsibility}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Individual Projects */}
+          {/* Verified individual projects */}
           {projects.length > 0 && (
-            <section className="mt-auto border-t border-border-subtle pt-7">
+            <section
+              className={`${member.isPlaceholder ? 'mt-6' : 'mt-auto'} border-t border-border-subtle pt-7`}
+            >
               <div className="mb-4 flex items-center gap-2">
                 <BriefcaseBusiness
                   size={16}
@@ -658,7 +649,7 @@ function MemberCard({ member, index }: MemberCardProps) {
               </div>
             </section>
           )}
-        </>
+        </div>
       )}
     </article>
   )
