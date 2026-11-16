@@ -323,7 +323,6 @@ function MemberCard({
     ? {
         member: 'สมาชิก',
         viewProfile: 'ดูโปรไฟล์',
-        profilePending: 'รอข้อมูลสมาชิก',
         rolePending: 'กำลังรอยืนยันบทบาท',
         biography: 'เกี่ยวกับสมาชิก',
         skills: 'ทักษะทางเทคนิค',
@@ -337,7 +336,6 @@ function MemberCard({
     : {
         member: 'Member',
         viewProfile: 'View profile',
-        profilePending: 'PROFILE PENDING',
         rolePending: 'Role pending confirmation',
         biography: 'About',
         skills: 'Technical Skills',
@@ -352,8 +350,15 @@ function MemberCard({
   const hasVerifiedName =
     !member.isPlaceholder || member.isNameVerified === true
 
+  const localizedName = member.fullNameI18n
+    ? getLocalizedText(member.fullNameI18n, language) || member.fullName.trim()
+    : member.fullName.trim()
+  const localizedNickname = member.nicknameI18n
+    ? getLocalizedText(member.nicknameI18n, language) || member.nickname.trim()
+    : member.nickname.trim()
+
   const displayName = hasVerifiedName
-    ? member.fullName.trim() || `${copy.member} ${index + 1}`
+    ? localizedName || `${copy.member} ${index + 1}`
     : `${copy.member} ${String(index + 1).padStart(2, '0')}`
 
   const initials = !hasVerifiedName
@@ -410,17 +415,11 @@ function MemberCard({
             MEMBER {String(index + 1).padStart(2, '0')}
           </span>
 
-          <span
-            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
-              member.isPlaceholder
-                ? 'bg-amber-400/10 text-amber-300'
-                : 'bg-white/5 text-brand-300'
-            }`}
-          >
-            {member.isPlaceholder
-              ? copy.profilePending
-              : member.roleKey}
-          </span>
+          {!member.isPlaceholder && (
+            <span className="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-brand-300">
+              {member.roleKey}
+            </span>
+          )}
         </div>
 
         <h3
@@ -430,9 +429,9 @@ function MemberCard({
           {displayName}
         </h3>
 
-        {hasVerifiedName && member.nickname.trim() && (
+        {hasVerifiedName && localizedNickname && (
           <p className="mt-1 text-xs text-slate-400">
-            @{member.nickname}
+            @{localizedNickname}
           </p>
         )}
       </div>

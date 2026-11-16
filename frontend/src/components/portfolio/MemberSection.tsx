@@ -1,12 +1,12 @@
 import { Users } from 'lucide-react'
 
 import { useLanguage } from '../../contexts/language-context'
-import { portfolioData } from '../../data/portfolioData'
+import { usePortfolioData } from '../../data/portfolioData'
 import MemberCard from './MemberCard'
 
 function MemberSection() {
   const { language } = useLanguage()
-  const { members } = portfolioData
+  const { members } = usePortfolioData()
   const isThai = language === 'th'
 
   const copy = isThai

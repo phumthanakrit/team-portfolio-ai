@@ -7,6 +7,8 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 
 import { LanguageProvider } from '../../contexts/LanguageProvider'
+import { portfolioData } from '../../../../backend/src/portfolioData'
+import { PortfolioDataContext } from '../../data/portfolioData'
 import TeamContact from './TeamContact'
 
 type TestLanguage = 'en' | 'th'
@@ -20,7 +22,9 @@ function renderTeamContact(language: TestLanguage) {
   return render(
     <LanguageProvider>
       <MemoryRouter>
-        <TeamContact />
+        <PortfolioDataContext.Provider value={portfolioData}>
+          <TeamContact />
+        </PortfolioDataContext.Provider>
       </MemoryRouter>
     </LanguageProvider>,
   )

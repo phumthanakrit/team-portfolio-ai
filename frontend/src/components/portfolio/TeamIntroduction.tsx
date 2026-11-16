@@ -11,27 +11,24 @@ import { useLanguage } from '../../contexts/language-context'
 
 import {
   getLocalizedText,
-  portfolioData,
+  usePortfolioData,
 } from '../../data/portfolioData'
 
 function TeamIntroduction() {
   const { language } = useLanguage()
 
-  const { group, members, teamProjects } = portfolioData
+  const { group, members, teamProjects } = usePortfolioData()
 
   const isThai = language === 'th'
 
   const copy = isThai
     ? {
-        eyebrow: 'WHO WE ARE',
+        eyebrow: 'เกี่ยวกับเรา',
         heading: 'รู้จักทีมของเรา',
         subtitle: 'แนวคิด วิสัยทัศน์ และสิ่งที่เราให้ความสำคัญ',
-        introduction: 'แนะนำทีมของเรา',
+        introduction: 'แนะนำทีมเรา',
         vision: 'วิสัยทัศน์ของทีม',
         strengths: 'จุดแข็งของทีมเรา',
-        pendingLabel: 'กำลังเตรียมข้อมูล',
-        introductionPending:
-          'ข้อมูลแนะนำทีมจะเพิ่มเติมหลังจากสมาชิกยืนยันข้อมูลของกลุ่มเรียบร้อยแล้ว',
         visionPending:
           'วิสัยทัศน์และเป้าหมายร่วมกันของทีมจะแสดงในส่วนนี้เมื่อได้รับการยืนยัน',
         strengthsPending:
@@ -48,9 +45,6 @@ function TeamIntroduction() {
         introduction: 'Team Introduction',
         vision: 'Our Vision',
         strengths: 'Our Core Strengths',
-        pendingLabel: 'CONTENT IN PROGRESS',
-        introductionPending:
-          'Our team introduction will be added after all members confirm the group profile.',
         visionPending:
           'Our shared vision and goals will appear here once they have been confirmed by the team.',
         strengthsPending:
@@ -60,18 +54,22 @@ function TeamIntroduction() {
         projects: 'VERIFIED TEAM PROJECTS',
       }
 
-  // Prevent demonstration text from being displayed as verified facts.
-  const introductionText = group.isPlaceholder
-    ? copy.introductionPending
-    : getLocalizedText(group.introduction, language) ||
-      copy.introductionPending
+  const introductionText = !group.isPlaceholder || group.isIntroductionVerified
+    ? getLocalizedText(group.introduction, language)
+    : ''
+  const introductionLead = introductionText && group.introductionLead
+    ? getLocalizedText(group.introductionLead, language)
+    : ''
 
-  const visionText = group.isPlaceholder
+  const visionText = group.isPlaceholder && !group.isVisionVerified
     ? copy.visionPending
     : getLocalizedText(group.vision, language) ||
       copy.visionPending
+  const visionLead = (!group.isPlaceholder || group.isVisionVerified) && group.visionLead
+    ? getLocalizedText(group.visionLead, language)
+    : ''
 
-  const verifiedStrengths = group.isPlaceholder
+  const verifiedStrengths = group.isPlaceholder && !group.showCoreStrengths
     ? []
     : group.coreStrengthsI18n
         .map((strength) => getLocalizedText(strength, language))
@@ -145,14 +143,9 @@ function TeamIntroduction() {
             </div>
 
             <p className="mt-6 text-sm leading-8 text-slate-400 sm:text-base">
+              {introductionLead && <><strong className="font-semibold text-slate-300">{introductionLead}</strong>{' '}</>}
               {introductionText}
             </p>
-
-            {group.isPlaceholder && (
-              <span className="mt-6 inline-flex rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1.5 text-[10px] font-semibold tracking-wider text-amber-300">
-                {copy.pendingLabel}
-              </span>
-            )}
           </article>
 
           <article className="rounded-panel border border-border-subtle bg-surface-900 p-7 sm:p-9">
@@ -167,14 +160,10 @@ function TeamIntroduction() {
             </div>
 
             <p className="mt-6 text-sm leading-8 text-slate-400 sm:text-base">
+              {visionLead && <><strong className="font-semibold text-slate-300">{visionLead}</strong><br /></>}
               {visionText}
             </p>
 
-            {group.isPlaceholder && (
-              <span className="mt-6 inline-flex rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1.5 text-[10px] font-semibold tracking-wider text-amber-300">
-                {copy.pendingLabel}
-              </span>
-            )}
           </article>
         </div>
 

@@ -15,11 +15,12 @@ import MemberSection from '../components/portfolio/MemberSection'
 import TeamContact from '../components/portfolio/TeamContact'
 import TeamProjectSection from '../components/portfolio/TeamProjectSection'
 import { useLanguage } from '../contexts/language-context'
-import { portfolioData } from '../data/portfolioData'
+import { usePortfolioData } from '../data/portfolioData'
 
 export function MemberProfilePage() {
   const { memberId } = useParams()
   const { language } = useLanguage()
+  const portfolioData = usePortfolioData()
   const member = portfolioData.members.find(
     (currentMember) => currentMember.id === memberId,
   )

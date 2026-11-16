@@ -5,12 +5,12 @@ import { Link } from 'react-router'
 import { useLanguage } from '../../contexts/language-context'
 import {
   getLocalizedText,
-  portfolioData,
+  usePortfolioData,
 } from '../../data/portfolioData'
 
 function TeamHero() {
   const { language } = useLanguage()
-  const { group, teamProjects } = portfolioData
+  const { group, teamProjects } = usePortfolioData()
 
   const copy =
     language === 'th'

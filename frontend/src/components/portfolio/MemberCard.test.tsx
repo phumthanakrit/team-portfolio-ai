@@ -25,7 +25,7 @@ import MemberCard from './MemberCard'
 
 import type { Member } from '../../data/portfolioData'
 
-import { portfolioData } from '../../data/portfolioData'
+import { portfolioData } from '../../../../backend/src/portfolioData'
 
 const LANGUAGE_STORAGE_KEY = 'team-portfolio-ai-language'
 
@@ -133,7 +133,7 @@ describe('MemberCard Component', () => {
   })
 
   it('should hide unverified placeholder member information', () => {
-    const placeholderMember = portfolioData.members[0]
+    const placeholderMember = { ...portfolioData.members[0], isNameVerified: false }
 
     renderMemberCard(placeholderMember)
 
@@ -146,7 +146,7 @@ describe('MemberCard Component', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
     expect(
-      screen.queryByText('Alex Frontier'),
+      screen.queryByText(placeholderMember.fullName),
     ).not.toBeInTheDocument()
 
     expect(
