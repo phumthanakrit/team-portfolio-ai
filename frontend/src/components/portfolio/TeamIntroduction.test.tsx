@@ -85,7 +85,7 @@ describe('TeamIntroduction Component', () => {
   it('should display the confirmed team member count', () => {
     renderTeamIntroduction()
 
-    expect(screen.getByText('03')).toBeInTheDocument()
+    expect(screen.getByText('03', { selector: 'p' })).toBeInTheDocument()
     expect(screen.getByText('TEAM MEMBERS')).toBeInTheDocument()
   })
 
